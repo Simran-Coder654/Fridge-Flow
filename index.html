@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FridgeFlow</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-dark: #0a1a24;
+            --primary-medium: #1b3b4f;
+            --accent-gold: #ffe9a7;
+            --accent-gold-dark: #f7d970;
+            --fridge-metal: #d0dce0;
+            --tray-blue: #ecf5fa;
+            --text-light: #f0f9ff;
+            --success-green: #4ecdc4;
+            --warning-red: #ff6b6b;
+            --level-blue: #5aa9e6;
+            --level-locked: #6c757d;
+            --level-completed: #28a745;
+            --coin-gold: #ffd966;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: radial-gradient(circle at 10% 30%, var(--primary-medium), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            padding: 0.25rem;
+            touch-action: none;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
+        }
+
+        .page {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(10, 30, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1rem;
+            box-shadow: 0 20px 30px -10px black;
+            max-height: 98vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+        }
+        
+        .hidden { display: none !important; }
+
+        .btn {
+            background: linear-gradient(145deg, var(--accent-gold-dark), #e5c55c);
+            border: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            color: var(--primary-dark);
+            cursor: pointer;
+            border-bottom: 5px solid #9e7f3e;
+            box-shadow: 0 6px 0 #7a5f2e;
+            min-width: 240px;
+            max-width: 90%;
+            letter-spacing: 1px;
+            transition: transform 0.1s, box-shadow 0.1s;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7a5f2e;
+        }
+        
+        .btn-small {
+            background: #263f4b;
+            border: 1px solid #aacad4;
+            color: white;
+            font-size: 0.9rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            border-bottom: 3px solid #0d262f;
+            white-space: nowrap;
+        }
+
+        .welcome-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        
+        .welcome-header h1 {
+            font-size: clamp(2.5rem, 10vw, 3.5rem);
+            color: var(--accent-gold);
+            text-shadow: 0 4px 0 #1a4a5f, 0 8px 8px rgba(0,0,0,0.5);
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            min-height: 200px;
+            width: 100%;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            background: #1d3e4f;
+            border-radius: 40px;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .stat-card {
+            background: #0d2c38;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-card span {
+            color: var(--accent-gold);
+            font-weight: 600;
+            min-width: 1.8rem;
+        }
+
+        /* Coin display */
+        .coin-display {
+            background: linear-gradient(145deg, #f5cb5c, #e6b422);
+            color: #2d2d2d;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid #ffecaa;
+            box-shadow: 0 4px 0 #9e7419;
+            margin-bottom: 1rem;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .coin-display span {
+            font-size: 1.4rem;
+        }
+
+        /* Category header */
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1d3e4f;
+            border-radius: 40px;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .category-title {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .category-back {
+            background: #0d2c38;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            border-bottom: 2px solid #1f4350;
+        }
+
+        /* Level grid - 40 levels in a clean 8x5 grid */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.6rem;
+            margin: 1.5rem 0 2rem;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 30px;
+        }
+        
+        .level-item {
+            aspect-ratio: 1/1;
+            background: #1f404f;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid #5d8b9c;
+            box-shadow: 0 4px 0 #0b1f27;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.2rem;
+            min-width: 0;
+        }
+        
+        .level-item:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0b1f27;
+        }
+        
+        /* Level states */
+        .level-item.completed {
+            background: #1e5f4b;
+            border-color: var(--success-green);
+            box-shadow: 0 4px 0 #0d3a2e;
+        }
+        
+        .level-item.active {
+            background: var(--level-blue);
+            border-color: #ffecaa;
+            box-shadow: 0 4px 0 #2d5a8c;
+            transform: scale(1.02);
+        }
+        
+        .level-item.locked {
+            background: #2d4250;
+            border-color: #4a5f6b;
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.7);
+        }
+        
+        .level-item.locked:active {
+            transform: none;
+            box-shadow: 0 4px 0 #0b1f27;
+        }
+        
+        .level-number {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .level-icon {
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+        
+        .level-coins {
+            font-size: 0.65rem;
+            background: rgba(0,0,0,0.4);
+            padding: 0.1rem 0.3rem;
+            border-radius: 10px;
+            margin-top: 2px;
+            color: var(--coin-gold);
+        }
+
+        .level-badge {
+            background: #2a5064;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid var(--level-blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .level-badge span {
+            color: var(--level-blue);
+            font-size: 1.2rem;
+        }
+
+        .category-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            width: 100%;
+        }
+        
+        .cat-btn {
+            background: linear-gradient(145deg, #2b505f, #15343e);
+            border: 2px solid #88b6c5;
+            border-radius: 60px;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.6rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #0b1f27;
+            width: 100%;
+            position: relative;
+        }
+        
+        .win-loss {
+            margin-left: auto;
+            background: #1f404f;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+        
+        .level-progress {
+            font-size: 0.9rem;
+            background: #0d2c38;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            color: var(--level-blue);
+            border: 1px solid var(--level-blue);
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1d3e4f;
+            border-radius: 40px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            gap: 0.5rem;
+        }
+        
+        .game-stats {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .game-stats .stat {
+            background: #0d2c38;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .item-belt {
+            background: #1b3d48c9;
+            border-radius: 40px;
+            padding: 0.6rem;
+            margin: 0.3rem 0 0.8rem;
+            border: 2px dashed #9dcbd9;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 4rem;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .item {
+            font-size: 1.6rem;
+            width: 2.4rem;
+            height: 2.4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, #fafff0, #7799a8);
+            border-radius: 30% 70% 50% 50% / 30% 40% 60% 70%;
+            box-shadow: 0 3px 0 #0c262f, 0 4px 6px black;
+            cursor: grab;
+            touch-action: none;
+            border: 2px solid rgba(255,255,255,0.3);
+            flex-shrink: 0;
+        }
+        
+        .item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+        
+        .drag-ghost {
+            position: fixed;
+            font-size: 2rem;
+            width: 2.6rem;
+            height: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, #fafff0, #7799a8);
+            border-radius: 30% 70% 50% 50% / 30% 40% 60% 70%;
+            box-shadow: 0 8px 15px black;
+            border: 3px solid var(--success-green);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.9;
+            transform: translate(-50%, -50%);
+        }
+
+        .shelf.highlight {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--success-green), inset 0 3px 3px rgba(255,255,255,0.9);
+            border-color: var(--success-green);
+            z-index: 5;
+        }
+
+        .fridge-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0.5rem 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 0.5rem 0;
+        }
+
+        .fridge {
+            width: 240px;
+            height: 320px;
+            position: relative;
+            perspective: 2000px;
+            margin: 0 auto;
+        }
+        
+        .fridge-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #d0dce0, #b1c2c9);
+            border-radius: 20px 20px 12px 12px;
+            box-shadow: 0 12px 15px -6px black, 0 0 0 2px rgba(255,255,200,0.3);
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 8px;
+        }
+        
+        .light-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, #fffde7, transparent 80%);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 20px;
+        }
+
+        .shelf-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            height: 60px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .shelf {
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(165deg, #e0ecf5, #b8d0db);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -2px 2px rgba(0,0,0,0.2), 0 4px 5px -3px #061016;
+            border-bottom: 3px solid #7fa0b0;
+            border-left: 1px solid rgba(255,255,255,0.5);
+            border-right: 1px solid rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .shelf.left { margin-right: 4px; }
+        .shelf.right { margin-left: 4px; }
+        .shelf.hidden-tray { opacity: 0.3; pointer-events: none; filter: grayscale(0.8); }
+
+        .tray-compartment {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 3px 5px;
+            border-radius: 15px;
+            box-shadow: inset 0 2px 3px white, 0 2px 0 #4a6b7a;
+            width: 92%;
+            height: 38px;
+            border: 1px solid rgba(255,255,200,0.6);
+        }
+        
+        .tray-cell {
+            width: 1.8rem;
+            height: 1.8rem;
+            background: #d4ecfc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: inset 0 2px 2px white, 0 2px 0 #3f6372;
+            border: 1px solid #9fc5d4;
+        }
+        
+        .tray-badge {
+            background: #0e2a33;
+            color: #ffecaa;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.2rem 0.3rem;
+            border-radius: 15px;
+            border: 2px solid #ffdb7c;
+            min-width: 2.4rem;
+            text-align: center;
+            box-shadow: 0 2px 0 #05232b;
+        }
+
+        .fridge-door {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(130deg, #f0faff, #d0e2ec);
+            border-radius: 20px;
+            transform-origin: right center;
+            transition: transform 0.5s;
+            box-shadow: -5px 5px 12px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            border: 2px solid rgba(255,255,240,0.4);
+            backdrop-filter: blur(2px);
+        }
+        .fridge-door.open { transform: rotateY(140deg); }
+        .handle {
+            position: absolute;
+            left: 6px;
+            top: 40%;
+            width: 6px;
+            height: 50px;
+            background: radial-gradient(circle at 20% 20%, #ccc, #3a4850);
+            border-radius: 8px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+            border: 1px solid #9aaeb8;
+        }
+        .door-badge {
+            background: #1f4350;
+            padding: 0.3rem 0.8rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            border: 2px solid #fdde8a;
+            white-space: nowrap;
+            box-shadow: 0 2px 0 #0f2f3a;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 15, 22, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .modal-overlay.show { visibility: visible; opacity: 1; }
+        .modal-card {
+            background: #1f404f;
+            padding: 1.5rem;
+            border-radius: 45px 12px 45px 12px;
+            border: 3px solid #f5cf7b;
+            text-align: center;
+            color: #fae7a6;
+            max-width: 90%;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #0d2c38;
+            border-radius: 3px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border: 1px solid #457085;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green), #ffe66d);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .victory-effect {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at center, rgba(78,205,196,0.3), transparent 70%);
+            animation: victoryPulse 1s ease-out;
+            z-index: 999;
+        }
+
+        @keyframes victoryPulse {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+
+        h2 { text-align: center; color: var(--accent-gold); margin-bottom: 1rem; font-size: 1.3rem; }
+        .continue-options { display: flex; gap: 0.8rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+        .continue-options .btn-small { font-size: 0.9rem; padding: 0.5rem 1.2rem; }
+
+        /* Responsive adjustments */
+        @media (max-width: 550px) {
+            .level-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 450px) {
+            .level-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 0.4rem;
+            }
+            .level-number { font-size: 1rem; }
+        }
+        
+        @media (max-width: 380px) {
+            .level-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .level-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .fridge { width: 200px; height: 280px; }
+            .shelf-row { height: 52px; }
+            .tray-cell { width: 1.5rem; height: 1.5rem; font-size: 1.1rem; }
+            .tray-badge { font-size: 0.65rem; min-width: 2rem; padding: 0.15rem 0.25rem; }
+            .tray-compartment { height: 34px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="welcomePage" class="page">
+        <div class="welcome-header">
+            <h1>FRIDGE FLOW</h1>
+        </div>
+        <div class="button-container">
+            <button class="btn" id="startBtn">START GAME</button>
+        </div>
+    </div>
+
+    <div id="categoryPage" class="page hidden">
+        <h2>CHOOSE CATEGORY</h2>
+        
+        <div class="coin-display">
+            <span>🪙</span> COINS: <span id="totalCoins">0</span>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">🏆 <span id="winTotal">0</span></div>
+            <div class="stat-card">💔 <span id="lossTotal">0</span></div>
+        </div>
+        
+        <div class="category-grid">
+            <div class="cat-btn" id="selectFruit">
+                <span>🍎🍌🍓</span>
+                <span>FRUITS</span>
+                <span class="level-progress" id="fruitLevel">Lvl 1/40</span>
+                <span class="win-loss" id="fruitWL">0/0</span>
+            </div>
+            <div class="cat-btn" id="selectVeg">
+                <span>🥕🥦🌽</span>
+                <span>VEGETABLES</span>
+                <span class="level-progress" id="vegLevel">Lvl 1/40</span>
+                <span class="win-loss" id="vegWL">0/0</span>
+            </div>
+            <div class="cat-btn" id="selectDrink">
+                <span>🥤🧃🍹</span>
+                <span>DRINKS</span>
+                <span class="level-progress" id="drinkLevel">Lvl 1/40</span>
+                <span class="win-loss" id="drinkWL">0/0</span>
+            </div>
+        </div>
+        
+        <button class="btn-small" id="backFromCat">← BACK</button>
+    </div>
+
+    <!-- Level selection page - 40 levels in clean grid -->
+    <div id="levelPage" class="page hidden">
+        <div class="category-header">
+            <button class="category-back" id="backToCategory">← CATEGORIES</button>
+            <div class="category-title" id="selectedCategoryTitle">🍎 FRUITS</div>
+            <div class="coin-display" style="margin-bottom: 0; padding: 0.2rem 1rem;">🪙 <span id="levelPageCoins">0</span></div>
+        </div>
+        
+        <h2>SELECT LEVEL (1-40)</h2>
+        
+        <!-- 40 level grid - 8 columns x 5 rows -->
+        <div class="level-grid" id="levelGrid"></div>
+        
+        <div class="stats-row" style="margin-top: 0.5rem;">
+            <div class="stat-card">🔓 <span id="unlockedCount">1</span>/40</div>
+            <div class="stat-card">✅ <span id="completedCount">0</span>/40</div>
+        </div>
+    </div>
+
+    <div id="gamePage" class="page hidden">
+        <div class="game-header">
+            <button class="btn-small" id="backToLevels">← LEVELS</button>
+            <div class="game-stats">
+                <div class="stat">⭐<span id="gameScore">0</span></div>
+                <div class="stat">⏳<span id="gameTime">120</span>s</div>
+            </div>
+        </div>
+        
+        <div class="level-badge">
+            <span>🎯</span> LEVEL <span id="currentLevel">1</span>/40 · 🪙 <span id="levelCoins">10</span> COINS
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="gameProgress" style="width: 0%"></div>
+        </div>
+        
+        <div class="item-belt" id="gameItems"></div>
+        
+        <div class="fridge-container">
+            <div class="fridge" id="fridgeContainer">
+                <div class="fridge-body" id="fridgeBody"></div>
+                <div class="fridge-door" id="door">
+                    <div class="handle"></div>
+                    <span class="door-badge">OPEN</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <h1 id="resultTitle">🏆</h1>
+            <div id="resultMessage"></div>
+            <div class="stats-row" style="margin: 1rem 0;">
+                <div class="stat-card">⭐ <span id="finalScore">0</span></div>
+                <div class="stat-card">⏱️ <span id="timeBonus">0</span></div>
+                <div class="stat-card">🪙 <span id="coinsEarned">0</span></div>
+            </div>
+            <div class="continue-options" id="victoryButtons">
+                <!-- Dynamic buttons -->
+            </div>
+        </div>
+    </div>
+
+    <audio id="ambientNormal" loop><source src="data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTG9uZWx5TGVlCg=="></audio>
+    <audio id="soundCorrect"><source src="data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gRGVmYXVsdAo="></audio>
+    <audio id="soundWrong"><source src="data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gU2lsZW5jZQo="></audio>
+    <audio id="soundVictory"><source src="data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gVmljdG9yeQo="></audio>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const CONFIG = {
+                TRAY_MAX: 10,
+                INITIAL_TIME: 120,
+                POINTS_PER_ITEM: 10,
+                PENALTY_PER_MISTAKE: 5,
+                MAX_LEVEL: 40,
+                COINS_PER_LEVEL: 10,
+                BASE_COINS: 2
+            };
+
+            const CATEGORIES = {
+                fruit: { 
+                    items: ['🍎','🍌','🍓','🍊','🍇','🍉','🍒','🍑','🍍','🥝','🍅','🍐'],
+                    name: 'Fruits',
+                    emoji: '🍎'
+                },
+                veg: { 
+                    items: ['🥕','🥦','🌽','🥬','🫑','🍆','🥔','🧅','🥒','🥕','🌶️','🥗'],
+                    name: 'Vegetables',
+                    emoji: '🥕'
+                },
+                drink: { 
+                    items: ['🥤','🧃','🍹','🧋','☕','🍵','🧉','🍺','🥛','🍷','🥂','🍸'],
+                    name: 'Drinks',
+                    emoji: '🥤'
+                }
+            };
+
+            // Game state - ALL CATEGORIES START AT LEVEL 1
+            let state = {
+                wins: { fruit: 0, veg: 0, drink: 0 },
+                losses: { fruit: 0, veg: 0, drink: 0 },
+                levels: { fruit: 1, veg: 1, drink: 1 }, // ALL START AT LEVEL 1
+                completedLevels: { 
+                    fruit: [], // Start with no completed levels
+                    veg: [],
+                    drink: [] 
+                },
+                totalCoins: 0, // Start with 0 coins
+                currentCategory: 'fruit',
+                currentLevel: 1,
+                currentScore: 0,
+                timeLeft: CONFIG.INITIAL_TIME,
+                gameActive: false,
+                trays: [],
+                itemQueue: [],
+                timerInterval: null,
+                gameWon: false,
+                levelCompleted: false
+            };
+
+            // Drag state
+            let drag = {
+                active: false,
+                item: null,
+                emoji: null,
+                ghost: null
+            };
+
+            // DOM elements
+            const elements = {
+                pages: {
+                    welcome: document.getElementById('welcomePage'),
+                    category: document.getElementById('categoryPage'),
+                    level: document.getElementById('levelPage'),
+                    game: document.getElementById('gamePage')
+                },
+                buttons: {
+                    start: document.getElementById('startBtn'),
+                    backFromCat: document.getElementById('backFromCat'),
+                    backToCat: document.getElementById('backToCat'),
+                    backToCategory: document.getElementById('backToCategory'),
+                    backToLevels: document.getElementById('backToLevels'),
+                    selectFruit: document.getElementById('selectFruit'),
+                    selectVeg: document.getElementById('selectVeg'),
+                    selectDrink: document.getElementById('selectDrink'),
+                },
+                stats: {
+                    winTotal: document.getElementById('winTotal'),
+                    lossTotal: document.getElementById('lossTotal'),
+                    fruitWL: document.getElementById('fruitWL'),
+                    vegWL: document.getElementById('vegWL'),
+                    drinkWL: document.getElementById('drinkWL'),
+                    fruitLevel: document.getElementById('fruitLevel'),
+                    vegLevel: document.getElementById('vegLevel'),
+                    drinkLevel: document.getElementById('drinkLevel'),
+                    gameScore: document.getElementById('gameScore'),
+                    gameTime: document.getElementById('gameTime'),
+                    gameProgress: document.getElementById('gameProgress'),
+                    finalScore: document.getElementById('finalScore'),
+                    timeBonus: document.getElementById('timeBonus'),
+                    currentLevel: document.getElementById('currentLevel'),
+                    levelCoins: document.getElementById('levelCoins'),
+                    totalCoins: document.getElementById('totalCoins'),
+                    levelPageCoins: document.getElementById('levelPageCoins'),
+                    unlockedCount: document.getElementById('unlockedCount'),
+                    completedCount: document.getElementById('completedCount'),
+                    coinsEarned: document.getElementById('coinsEarned')
+                },
+                level: {
+                    grid: document.getElementById('levelGrid'),
+                    categoryTitle: document.getElementById('selectedCategoryTitle')
+                },
+                game: {
+                    items: document.getElementById('gameItems'),
+                    fridgeBody: document.getElementById('fridgeBody'),
+                    door: document.getElementById('door'),
+                },
+                modal: {
+                    overlay: document.getElementById('resultModal'),
+                    title: document.getElementById('resultTitle'),
+                    message: document.getElementById('resultMessage'),
+                    victoryButtons: document.getElementById('victoryButtons')
+                },
+                audio: {
+                    ambientNormal: document.getElementById('ambientNormal'),
+                    soundCorrect: document.getElementById('soundCorrect'),
+                    soundWrong: document.getElementById('soundWrong'),
+                    soundVictory: document.getElementById('soundVictory')
+                }
+            };
+
+            // Audio manager
+            const audioManager = {
+                init() {
+                    Object.values(elements.audio).forEach(audio => {
+                        if (audio) audio.volume = 0.2;
+                    });
+                },
+                playAmbient() { elements.audio.ambientNormal.play().catch(() => {}); },
+                stopAmbient() {
+                    elements.audio.ambientNormal.pause();
+                    elements.audio.ambientNormal.currentTime = 0;
+                },
+                playCorrect() { 
+                    elements.audio.soundCorrect.currentTime = 0;
+                    elements.audio.soundCorrect.play().catch(() => {}); 
+                },
+                playWrong() { 
+                    elements.audio.soundWrong.currentTime = 0;
+                    elements.audio.soundWrong.play().catch(() => {}); 
+                },
+                playVictory() {
+                    elements.audio.soundVictory.currentTime = 0;
+                    elements.audio.soundVictory.play().catch(() => {});
+                }
+            };
+
+            // Calculate multiplier based on level
+            function getMultiplier(level) {
+                return 0.5 + (level - 1) * 0.05;
+            }
+
+            // Calculate coins earned for win
+            function calculateCoinsEarned(level) {
+                return Math.floor(CONFIG.BASE_COINS * getMultiplier(level) * 3);
+            }
+
+            // Level grid rendering for 40 levels
+            function renderLevelGrid(category) {
+                const grid = elements.level.grid;
+                grid.innerHTML = '';
+                
+                const currentUnlocked = state.levels[category];
+                const completed = state.completedLevels[category] || [];
+                
+                // Create 40 levels in order
+                for (let i = 1; i <= CONFIG.MAX_LEVEL; i++) {
+                    const levelItem = document.createElement('div');
+                    levelItem.className = 'level-item';
+                    
+                    // Determine level state
+                    if (completed.includes(i)) {
+                        levelItem.classList.add('completed');
+                    } else if (i === currentUnlocked) {
+                        levelItem.classList.add('active');
+                    } else if (i > currentUnlocked) {
+                        levelItem.classList.add('locked');
+                    }
+                    
+                    // Simple, clear content
+                    levelItem.innerHTML = `
+                        <div class="level-number">${i}</div>
+                        <div class="level-icon">${completed.includes(i) ? '✅' : (i === currentUnlocked ? '🔓' : '🔒')}</div>
+                        <div class="level-coins">🪙${calculateCoinsEarned(i)}</div>
+                    `;
+                    
+                    // Add click handler (only if unlocked)
+                    levelItem.addEventListener('click', () => {
+                        if (i <= currentUnlocked) {
+                            startGameWithLevel(category, i);
+                        }
+                    });
+                    
+                    grid.appendChild(levelItem);
+                }
+                
+                // Update stats
+                elements.stats.unlockedCount.textContent = currentUnlocked;
+                elements.stats.completedCount.textContent = completed.length;
+                elements.stats.levelPageCoins.textContent = state.totalCoins;
+            }
+
+            // Drag and drop system
+            const dragDrop = {
+                startDrag(item, emoji, clientX, clientY) {
+                    if (!state.gameActive || state.gameWon) return;
+                    
+                    drag.active = true;
+                    drag.item = item;
+                    drag.emoji = emoji;
+                    
+                    drag.ghost = document.createElement('div');
+                    drag.ghost.className = 'drag-ghost';
+                    drag.ghost.textContent = emoji;
+                    document.body.appendChild(drag.ghost);
+                    
+                    drag.ghost.style.left = clientX + 'px';
+                    drag.ghost.style.top = clientY + 'px';
+                    
+                    item.style.opacity = '0.3';
+                    
+                    state.trays.forEach(tray => {
+                        if (tray.emoji === emoji && tray.current < tray.max && !tray.el.classList.contains('hidden-tray')) {
+                            tray.el.classList.add('highlight');
+                        }
+                    });
+                },
+
+                moveDrag(clientX, clientY) {
+                    if (!drag.active || !drag.ghost) return;
+                    drag.ghost.style.left = clientX + 'px';
+                    drag.ghost.style.top = clientY + 'px';
+                },
+
+                endDrag(clientX, clientY) {
+                    if (!drag.active || !drag.item || !drag.ghost) {
+                        this.cleanupDrag();
+                        return;
+                    }
+
+                    const elementsAtPoint = document.elementsFromPoint(clientX, clientY);
+                    let droppedOnTray = null;
+                    
+                    for (let el of elementsAtPoint) {
+                        if (el.classList && el.classList.contains('shelf')) {
+                            droppedOnTray = el;
+                            break;
+                        }
+                    }
+
+                    if (droppedOnTray && !state.gameWon) {
+                        const tray = state.trays.find(t => t.el === droppedOnTray);
+                        if (tray) {
+                            this.handleDrop(tray);
+                        } else {
+                            this.cleanupDrag();
+                        }
+                    } else {
+                        if (state.gameActive && !state.gameWon) {
+                            state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
+                            elements.stats.gameScore.textContent = state.currentScore;
+                            audioManager.playWrong();
+                        }
+                        this.cleanupDrag();
+                    }
+                },
+
+                handleDrop(tray) {
+                    if (!drag.active || !drag.item || !drag.emoji || state.gameWon) {
+                        this.cleanupDrag();
+                        return;
+                    }
+
+                    if (drag.emoji === tray.emoji && tray.current < tray.max) {
+                        tray.current++;
+                        tray.badge.textContent = `${tray.current}/${tray.max}`;
+                        
+                        state.currentScore += CONFIG.POINTS_PER_ITEM;
+                        elements.stats.gameScore.textContent = state.currentScore;
+                        
+                        if (drag.item.parentNode) {
+                            drag.item.remove();
+                        }
+                        
+                        const itemIndex = state.itemQueue.indexOf(drag.emoji);
+                        if (itemIndex !== -1) {
+                            state.itemQueue.splice(itemIndex, 1);
+                        }
+                        
+                        audioManager.playCorrect();
+                        
+                        if (tray.current >= tray.max) {
+                            tray.el.classList.add('hidden-tray');
+                        }
+                        
+                        if (state.itemQueue.length < 4) {
+                            this.fillItemQueue();
+                        }
+                        
+                        gameLogic.updateItemBelt();
+                        gameLogic.updateProgressBar();
+                        gameLogic.checkWinCondition();
+                    } else {
+                        state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
+                        elements.stats.gameScore.textContent = state.currentScore;
+                        audioManager.playWrong();
+                    }
+
+                    this.cleanupDrag();
+                },
+
+                fillItemQueue() {
+                    const availableTrays = state.trays.filter(t => t.current < t.max);
+                    
+                    if (availableTrays.length === 0) {
+                        state.itemQueue = [];
+                        return;
+                    }
+                    
+                    state.itemQueue = [];
+                    for (let i = 0; i < 12; i++) {
+                        const randomTray = availableTrays[Math.floor(Math.random() * availableTrays.length)];
+                        state.itemQueue.push(randomTray.emoji);
+                    }
+                },
+
+                cleanupDrag() {
+                    if (drag.ghost && drag.ghost.parentNode) {
+                        drag.ghost.parentNode.removeChild(drag.ghost);
+                    }
+                    
+                    if (drag.item) {
+                        drag.item.style.opacity = '1';
+                    }
+                    
+                    state.trays.forEach(tray => tray.el.classList.remove('highlight'));
+                    
+                    drag.active = false;
+                    drag.item = null;
+                    drag.emoji = null;
+                    drag.ghost = null;
+                }
+            };
+
+            // Game logic
+            const gameLogic = {
+                buildFridge(category, level) {
+                    const items = CATEGORIES[category].items;
+                    elements.game.fridgeBody.innerHTML = '<div class="light-glow"></div>';
+                    
+                    state.trays = [];
+                    
+                    const numTrays = Math.min(4 + Math.floor(level / 6), 8);
+                    
+                    for (let row = 0; row < 4; row++) {
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'shelf-row';
+                        
+                        const leftItemIndex = row * 2;
+                        if (leftItemIndex < numTrays && leftItemIndex < items.length) {
+                            const leftShelf = this.createShelf(items[leftItemIndex], 'left');
+                            rowDiv.appendChild(leftShelf);
+                            
+                            state.trays.push({
+                                el: leftShelf,
+                                badge: leftShelf.querySelector('.tray-badge'),
+                                current: 0,
+                                max: CONFIG.TRAY_MAX,
+                                emoji: items[leftItemIndex],
+                                row: row,
+                                position: 'left'
+                            });
+                        }
+                        
+                        const rightItemIndex = row * 2 + 1;
+                        if (rightItemIndex < numTrays && rightItemIndex < items.length) {
+                            const rightShelf = this.createShelf(items[rightItemIndex], 'right');
+                            rowDiv.appendChild(rightShelf);
+                            
+                            state.trays.push({
+                                el: rightShelf,
+                                badge: rightShelf.querySelector('.tray-badge'),
+                                current: 0,
+                                max: CONFIG.TRAY_MAX,
+                                emoji: items[rightItemIndex],
+                                row: row,
+                                position: 'right'
+                            });
+                        }
+                        
+                        elements.game.fridgeBody.appendChild(rowDiv);
+                    }
+                    
+                    elements.stats.currentLevel.textContent = level;
+                    elements.stats.levelCoins.textContent = CONFIG.COINS_PER_LEVEL;
+                },
+
+                createShelf(emoji, position) {
+                    const shelf = document.createElement('div');
+                    shelf.className = `shelf ${position}`;
+                    shelf.dataset.emoji = emoji;
+                    
+                    shelf.innerHTML = `
+                        <div class="tray-compartment">
+                            <div class="tray-cell">${emoji}</div>
+                            <span class="tray-badge">0/${CONFIG.TRAY_MAX}</span>
+                        </div>
+                    `;
+                    
+                    return shelf;
+                },
+
+                updateItemBelt() {
+                    elements.game.items.innerHTML = '';
+                    
+                    if (state.gameWon || !state.gameActive) return;
+                    
+                    if (state.itemQueue.length === 0) {
+                        dragDrop.fillItemQueue();
+                    }
+                    
+                    const availableTrays = state.trays.filter(t => t.current < t.max);
+                    if (availableTrays.length === 0) {
+                        elements.game.items.innerHTML = '<div style="opacity:0.5; font-size:0.9rem;">✨ All full! ✨</div>';
+                        return;
+                    }
+                    
+                    state.itemQueue.slice(0, 8).forEach(emoji => {
+                        const item = document.createElement('span');
+                        item.className = 'item';
+                        item.textContent = emoji;
+                        
+                        item.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            dragDrop.startDrag(item, emoji, e.clientX, e.clientY);
+                        });
+                        
+                        item.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            const touch = e.touches[0];
+                            dragDrop.startDrag(item, emoji, touch.clientX, touch.clientY);
+                        }, { passive: false });
+                        
+                        elements.game.items.appendChild(item);
+                    });
+                },
+
+                updateProgressBar() {
+                    const totalItems = state.trays.reduce((sum, t) => sum + t.current, 0);
+                    const totalPossible = state.trays.length * CONFIG.TRAY_MAX;
+                    const percentage = totalPossible ? (totalItems / totalPossible) * 100 : 0;
+                    elements.stats.gameProgress.style.width = `${percentage}%`;
+                },
+
+                checkWinCondition() {
+                    const allFull = state.trays.every(t => t.current >= t.max);
+                    
+                    if (allFull && state.gameActive && !state.gameWon) {
+                        state.gameWon = true;
+                        state.levelCompleted = true;
+                        this.endGame('win');
+                    }
+                },
+
+                endGame(result) {
+                    state.gameActive = false;
+                    state.gameWon = (result === 'win');
+                    
+                    clearInterval(state.timerInterval);
+                    dragDrop.cleanupDrag();
+                    
+                    const timeBonus = Math.floor(state.timeLeft / 10) * 2;
+                    const totalScore = state.currentScore + timeBonus;
+                    
+                    if (result === 'win') {
+                        const currentLevel = state.currentLevel;
+                        const coinsEarned = calculateCoinsEarned(currentLevel);
+                        
+                        state.totalCoins += coinsEarned;
+                        
+                        // Mark level as completed if not already
+                        if (!state.completedLevels[state.currentCategory].includes(currentLevel)) {
+                            state.completedLevels[state.currentCategory].push(currentLevel);
+                        }
+                        
+                        // Unlock next level if this was the current highest
+                        if (currentLevel === state.levels[state.currentCategory] && currentLevel < CONFIG.MAX_LEVEL) {
+                            state.levels[state.currentCategory]++;
+                        }
+                        
+                        state.wins[state.currentCategory]++;
+                        
+                        elements.modal.title.textContent = '🏆 VICTORY!';
+                        elements.modal.message.textContent = `Level ${currentLevel} completed!`;
+                        elements.stats.coinsEarned.textContent = `+${coinsEarned}`;
+                        
+                        const effect = document.createElement('div');
+                        effect.className = 'victory-effect';
+                        document.body.appendChild(effect);
+                        setTimeout(() => effect.remove(), 1000);
+                        
+                        audioManager.playVictory();
+                        
+                        elements.stats.finalScore.textContent = totalScore;
+                        elements.stats.timeBonus.textContent = `+${timeBonus}`;
+                        
+                        this.showVictoryButtons(true, currentLevel);
+                    } else {
+                        state.losses[state.currentCategory]++;
+                        elements.modal.title.textContent = '⏰ TIME\'S UP';
+                        elements.modal.message.textContent = 'Try again!';
+                        elements.stats.finalScore.textContent = state.currentScore;
+                        elements.stats.timeBonus.textContent = '0';
+                        elements.stats.coinsEarned.textContent = '0';
+                        
+                        audioManager.playWrong();
+                        
+                        this.showVictoryButtons(false);
+                    }
+                    
+                    elements.modal.overlay.classList.add('show');
+                    elements.game.items.innerHTML = '';
+                    
+                    this.updateStats();
+                    audioManager.stopAmbient();
+                },
+
+                showVictoryButtons(isVictory, completedLevel) {
+                    const buttonsDiv = elements.modal.victoryButtons;
+                    buttonsDiv.innerHTML = '';
+                    
+                    if (isVictory) {
+                        const isMaxLevel = completedLevel === CONFIG.MAX_LEVEL;
+                        
+                        const playAgainBtn = document.createElement('button');
+                        playAgainBtn.className = 'btn-small';
+                        playAgainBtn.textContent = 'PLAY AGAIN';
+                        playAgainBtn.onclick = () => {
+                            elements.modal.overlay.classList.remove('show');
+                            startGameWithLevel(state.currentCategory, completedLevel);
+                        };
+                        buttonsDiv.appendChild(playAgainBtn);
+                        
+                        if (!isMaxLevel) {
+                            const nextBtn = document.createElement('button');
+                            nextBtn.className = 'btn-small';
+                            nextBtn.style.background = '#5aa9e6';
+                            nextBtn.style.borderBottomColor = '#2d5a8c';
+                            nextBtn.innerHTML = '➡️ NEXT LEVEL';
+                            nextBtn.onclick = () => {
+                                elements.modal.overlay.classList.remove('show');
+                                startGameWithLevel(state.currentCategory, completedLevel + 1);
+                            };
+                            buttonsDiv.appendChild(nextBtn);
+                        }
+                        
+                        const levelsBtn = document.createElement('button');
+                        levelsBtn.className = 'btn-small';
+                        levelsBtn.textContent = 'LEVELS';
+                        levelsBtn.onclick = () => {
+                            elements.modal.overlay.classList.remove('show');
+                            showLevelPage(state.currentCategory);
+                        };
+                        buttonsDiv.appendChild(levelsBtn);
+                    } else {
+                        const tryAgainBtn = document.createElement('button');
+                        tryAgainBtn.className = 'btn-small';
+                        tryAgainBtn.textContent = 'TRY AGAIN';
+                        tryAgainBtn.onclick = () => {
+                            elements.modal.overlay.classList.remove('show');
+                            startGameWithLevel(state.currentCategory, state.currentLevel);
+                        };
+                        buttonsDiv.appendChild(tryAgainBtn);
+                        
+                        const levelsBtn = document.createElement('button');
+                        levelsBtn.className = 'btn-small';
+                        levelsBtn.textContent = 'LEVELS';
+                        levelsBtn.onclick = () => {
+                            elements.modal.overlay.classList.remove('show');
+                            showLevelPage(state.currentCategory);
+                        };
+                        buttonsDiv.appendChild(levelsBtn);
+                    }
+                },
+
+                updateStats() {
+                    const totalWins = state.wins.fruit + state.wins.veg + state.wins.drink;
+                    const totalLosses = state.losses.fruit + state.losses.veg + state.losses.drink;
+                    
+                    elements.stats.winTotal.textContent = totalWins;
+                    elements.stats.lossTotal.textContent = totalLosses;
+                    elements.stats.totalCoins.textContent = state.totalCoins;
+                    
+                    elements.stats.fruitWL.textContent = `${state.wins.fruit}/${state.losses.fruit}`;
+                    elements.stats.vegWL.textContent = `${state.wins.veg}/${state.losses.veg}`;
+                    elements.stats.drinkWL.textContent = `${state.wins.drink}/${state.losses.drink}`;
+                    
+                    elements.stats.fruitLevel.textContent = `Lvl ${state.levels.fruit}/40`;
+                    elements.stats.vegLevel.textContent = `Lvl ${state.levels.veg}/40`;
+                    elements.stats.drinkLevel.textContent = `Lvl ${state.levels.drink}/40`;
+                },
+
+                resetGame() {
+                    state.currentScore = 0;
+                    state.timeLeft = CONFIG.INITIAL_TIME;
+                    state.gameActive = false;
+                    state.gameWon = false;
+                    state.levelCompleted = false;
+                    state.itemQueue = [];
+                    state.trays = [];
+                    
+                    elements.stats.gameScore.textContent = '0';
+                    elements.stats.gameTime.textContent = CONFIG.INITIAL_TIME;
+                    elements.stats.gameProgress.style.width = '0%';
+                    elements.stats.gameTime.style.color = '';
+                    
+                    dragDrop.cleanupDrag();
+                }
+            };
+
+            // Timer
+            function startTimer() {
+                clearInterval(state.timerInterval);
+                
+                state.timerInterval = setInterval(() => {
+                    if (!state.gameActive || state.gameWon) return;
+                    
+                    state.timeLeft--;
+                    elements.stats.gameTime.textContent = state.timeLeft;
+                    
+                    if (state.timeLeft <= 30) {
+                        elements.stats.gameTime.style.color = '#ff6b6b';
+                    }
+                    
+                    if (state.timeLeft <= 0) {
+                        gameLogic.endGame('loss');
+                    }
+                }, 1000);
+            }
+
+            // Navigation
+            function showPage(pageId) {
+                Object.values(elements.pages).forEach(page => page.classList.add('hidden'));
+                elements.pages[pageId].classList.remove('hidden');
+                
+                if (pageId !== 'game') {
+                    dragDrop.cleanupDrag();
+                    audioManager.stopAmbient();
+                }
+                
+                if (pageId === 'category') {
+                    gameLogic.updateStats();
+                }
+            }
+
+            function showLevelPage(category) {
+                state.currentCategory = category;
+                const categoryData = CATEGORIES[category];
+                elements.level.categoryTitle.innerHTML = `${categoryData.emoji} ${categoryData.name}`;
+                renderLevelGrid(category);
+                showPage('level');
+            }
+
+            function startGameWithLevel(category, level) {
+                gameLogic.resetGame();
+                
+                state.currentCategory = category;
+                state.currentLevel = level;
+                state.gameActive = true;
+                state.gameWon = false;
+                
+                gameLogic.buildFridge(category, level);
+                dragDrop.fillItemQueue();
+                gameLogic.updateItemBelt();
+                
+                elements.game.door.classList.remove('open');
+                elements.game.door.onclick = () => elements.game.door.classList.toggle('open');
+                
+                audioManager.playAmbient();
+                startTimer();
+                
+                showPage('game');
+            }
+
+            // Event listeners
+            function setupEventListeners() {
+                document.addEventListener('mousemove', (e) => dragDrop.moveDrag(e.clientX, e.clientY));
+                document.addEventListener('mouseup', (e) => dragDrop.endDrag(e.clientX, e.clientY));
+                
+                document.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    dragDrop.moveDrag(touch.clientX, touch.clientY);
+                }, { passive: false });
+                
+                document.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    const touch = e.changedTouches[0];
+                    dragDrop.endDrag(touch.clientX, touch.clientY);
+                }, { passive: false });
+                
+                document.addEventListener('touchcancel', () => dragDrop.cleanupDrag());
+
+                elements.buttons.start.addEventListener('click', () => {
+                    showPage('category');
+                    gameLogic.updateStats();
+                });
+
+                elements.buttons.backFromCat.addEventListener('click', () => showPage('welcome'));
+                
+                elements.buttons.backToCategory.addEventListener('click', () => showPage('category'));
+                elements.buttons.backToLevels.addEventListener('click', () => showLevelPage(state.currentCategory));
+
+                elements.buttons.selectFruit.addEventListener('click', () => showLevelPage('fruit'));
+                elements.buttons.selectVeg.addEventListener('click', () => showLevelPage('veg'));
+                elements.buttons.selectDrink.addEventListener('click', () => showLevelPage('drink'));
+            }
+
+            // Initialize
+            function init() {
+                audioManager.init();
+                setupEventListeners();
+                gameLogic.updateStats();
+                // NO DEMO DATA - all categories start fresh at level 1
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
