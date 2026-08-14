@@ -11,6 +11,7 @@
                    script-src 'unsafe-inline'">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ===== ALL STYLES ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -301,7 +302,10 @@
             pointer-events: none;
         }
         .fridge-door.open { transform: rotateY(150deg); }
-        .fridge-door.open .door-label { display: none; }
+        /* ✅ HIDE "OPEN" TEXT WHEN DOOR IS OPEN */
+        .fridge-door.open .door-label {
+            display: none;
+        }
         .handle {
             position: absolute;
             left: 10px;
@@ -920,7 +924,7 @@
         </div>
         <div class="progress-bar"><div class="progress-fill" id="gameProgress"></div></div>
 
-        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Drag junk to trash bin</div>
+        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Drag junk to trash bin (+5s)</div>
 
         <div class="item-belt" id="gameItems"></div>
 
@@ -1024,7 +1028,8 @@
                 JUNK_ITEMS: ['🧹', '🗑️', '🧊', '💣', '🧽'],
                 GOLDEN_CHANCE: 0.08,
                 MAX_PARTICLES: 50,
-                BELT_SIZE: 8
+                BELT_SIZE: 8,
+                JUNK_BONUS_SECONDS: 5   // ✅ +5 seconds per junk discard
             };
 
             const ACHIEVEMENTS = {
@@ -1756,13 +1761,13 @@
                     state.junkCount++;
                     state.totalJunkDiscarded++;
                     document.getElementById('junkCount').textContent = state.junkCount;
-                    showFloatingText(x, y - 30, '🗑️ DISCARDED +2s', '#A47864');
+                    showFloatingText(x, y - 30, '🗑️ DISCARDED +5s', '#A47864');
                     burstParticles(x, y, 8, 20);
                     playClickSound();
                     playCoinSound();
 
-                    // +2 seconds bonus (cap at initial time)
-                    state.timeLeft = Math.min(state.timeLeft + 2, state.levelStartTime);
+                    // ✅ +5 seconds bonus (capped at initial time)
+                    state.timeLeft = Math.min(state.timeLeft + CONFIG.JUNK_BONUS_SECONDS, state.levelStartTime);
                     document.getElementById('gameTime').textContent = state.timeLeft;
 
                     if (drag.item && drag.item.parentNode) drag.item.remove();
@@ -1867,7 +1872,7 @@
                         document.getElementById('gameScore').textContent = state.currentScore;
                         shakeFridge();
 
-                        // If the shelf exists and is not poisoned and not full, remove 2 items from it
+                        // ✅ Remove 2 items from the shelf if possible
                         if (tray && !tray.poisoned && tray.current > 0) {
                             const removeCount = Math.min(2, tray.current);
                             tray.current -= removeCount;
