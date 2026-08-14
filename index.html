@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FridgeFlow - Pro</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   style-src 'unsafe-inline' https://fonts.googleapis.com; 
+                   font-src https://fonts.gstatic.com; 
+                   script-src 'unsafe-inline'">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ===== ALL STYLES ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -297,6 +302,7 @@
             pointer-events: none;
         }
         .fridge-door.open { transform: rotateY(150deg); }
+        .fridge-door.open .door-label { display: none; }
         .handle {
             position: absolute;
             left: 10px;
@@ -343,15 +349,15 @@
         .shelf {
             width: 48%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(2px);
+            background: rgba(245, 237, 230, 0.85) !important;
+            backdrop-filter: blur(4px);
             border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 4px 6px -4px rgba(0,0,0,0.1);
-            border-bottom: 2px solid rgba(255,255,255,0.3);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 4px 8px -4px rgba(0,0,0,0.15);
+            border: 2px solid rgba(164, 120, 100, 0.3);
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
@@ -368,7 +374,7 @@
             gap: 4px;
             justify-content: center;
             align-items: center;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.5);
             padding: 2px 6px;
             border-radius: 14px;
             width: 92%;
@@ -389,11 +395,16 @@
         @keyframes pulseBar { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
         .shelf.spoiling { border-color: #BF5722 !important; box-shadow: 0 0 20px rgba(191,87,34,0.3) !important; }
-        .shelf.poisoned { background: rgba(191,87,34,0.15) !important; border-color: #BF5722 !important; }
+        .shelf.poisoned { background: rgba(191,87,34,0.2) !important; border-color: #BF5722 !important; }
         .shelf.full { 
-            background: rgba(139, 168, 136, 0.3) !important;
-            border-color: #8BA888 !important;
+            background: rgba(139, 168, 136, 0.35) !important;
+            border-color: #4CAF50 !important;
+            border-width: 3px !important;
             animation: fullFlash 0.5s ease;
+        }
+        .shelf.highlight {
+            border-color: #E8A14A !important;
+            box-shadow: 0 0 15px rgba(232,161,74,0.5) !important;
         }
         @keyframes fullFlash {
             0% { box-shadow: 0 0 0 rgba(139, 168, 136, 0); }
@@ -404,7 +415,7 @@
         .tray-cell {
             width: 1.8rem;
             height: 1.8rem;
-            background: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.7);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -422,13 +433,14 @@
             min-width: 1.8rem;
             text-align: center;
         }
+
         .hidden-tray {
-            opacity: 0.8;
-            background: #D4E8D0 !important;
-            border: 2px solid #8BA888 !important;
-            box-shadow: inset 0 0 20px rgba(139,168,136,0.15);
+            background: rgba(100, 140, 100, 0.4) !important;
+            border: 3px solid #6A9B6A !important;
+            box-shadow: 0 0 20px rgba(100, 180, 100, 0.2) !important;
         }
-        .hidden-tray .tray-badge { background: #8BA888; color: #FDF6E3; }
+        .hidden-tray .tray-badge { background: #6A9B6A; color: #FDF6E3; }
+        .hidden-tray .tray-cell { background: rgba(255,255,255,0.4); }
 
         .trash-bin {
             position: absolute;
@@ -455,22 +467,29 @@
         .item-belt {
             background: rgba(0,0,0,0.03);
             border-radius: 40px;
-            padding: 0.5rem;
+            padding: 0.6rem 0.8rem;
             margin: 0.4rem 0;
             border: 1px dashed rgba(164, 120, 100, 0.2);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 0.6rem;
             min-height: 3.5rem;
             backdrop-filter: blur(4px);
             position: relative;
+            z-index: 20;
             transition: all 0.3s;
+        }
+        .item-belt:empty {
+            display: none;
         }
         .item {
             font-size: 1.6rem;
             width: 2.6rem;
             height: 2.6rem;
+            flex-shrink: 0;
+            flex-grow: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -516,6 +535,56 @@
             0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
             100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
         }
+        /* Power-up icons */
+        .item.bomb {
+            background: radial-gradient(circle at 30% 30%, #FF6B6B, #B22222) !important;
+            box-shadow: 0 4px 0 #8B0000, 0 0 20px rgba(255,0,0,0.4) !important;
+            animation: bombPulse 0.8s infinite alternate;
+        }
+        @keyframes bombPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+            100% { transform: scale(1.1); box-shadow: 0 0 30px rgba(255,0,0,0.7); }
+        }
+        .item.bomb::after {
+            content: '💣';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+        .item.ice {
+            background: radial-gradient(circle at 30% 30%, #A8E6CF, #4A90D9) !important;
+            box-shadow: 0 4px 0 #1B4F8B, 0 0 20px rgba(74,144,217,0.4) !important;
+            animation: icePulse 1s infinite alternate;
+        }
+        @keyframes icePulse {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.05) rotate(5deg); }
+        }
+        .item.ice::after {
+            content: '❄️';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+        .item.grape {
+            background: radial-gradient(circle at 30% 30%, #B39DDB, #6A1B9A) !important;
+            box-shadow: 0 4px 0 #4A148C, 0 0 20px rgba(106,27,154,0.4) !important;
+            animation: grapePulse 0.6s infinite alternate;
+        }
+        @keyframes grapePulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(106,27,154,0.3); }
+            100% { transform: scale(1.08); box-shadow: 0 0 30px rgba(106,27,154,0.7); }
+        }
+        .item.grape::after {
+            content: '🍇';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+
         .item:active { cursor: grabbing; }
 
         .drag-ghost {
@@ -543,6 +612,18 @@
         .drag-ghost.golden {
             border-color: #FFD700;
             background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520);
+        }
+        .drag-ghost.bomb {
+            border-color: #FF0000;
+            background: radial-gradient(circle at 30% 30%, #FF6B6B, #B22222);
+        }
+        .drag-ghost.ice {
+            border-color: #4A90D9;
+            background: radial-gradient(circle at 30% 30%, #A8E6CF, #4A90D9);
+        }
+        .drag-ghost.grape {
+            border-color: #6A1B9A;
+            background: radial-gradient(circle at 30% 30%, #B39DDB, #6A1B9A);
         }
 
         .game-header {
@@ -652,6 +733,46 @@
             100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); }
         }
 
+        /* Overlays for power-ups */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9996;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+            background: rgba(0,0,0,0.3);
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .overlay .label {
+            font-size: 2rem;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.6);
+            padding: 0.5rem 2rem;
+            border-radius: 40px;
+            margin-top: 1rem;
+        }
+        .overlay.freeze {
+            background: rgba(74, 144, 217, 0.2);
+        }
+        .overlay.freeze .label {
+            color: #A8E6CF;
+        }
+        .overlay.bomb {
+            background: rgba(255, 0, 0, 0.2);
+        }
+        .overlay.bomb .label {
+            color: #FF6B6B;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -680,18 +801,6 @@
         .star-display { font-size: 2.5rem; letter-spacing: 10px; margin: 0.5rem 0; }
         .coins-earned-display { font-size: 1.2rem; font-weight: 700; color: #8B645A; margin: 0.5rem 0; }
         .gatekeeper-message { color: #BF5722; font-weight: 700; margin: 0.5rem 0; }
-
-        /* Leaderboard Modal */
-        .leaderboard-modal .modal-card { max-width: 400px; }
-        .leaderboard-modal .lb-entry { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 0.3rem 0; 
-            border-bottom: 1px solid #E4D5C8; 
-        }
-        .leaderboard-modal .lb-entry .rank { font-weight: 700; color: #8B645A; }
-        .leaderboard-modal .lb-entry .name { flex: 1; margin-left: 1rem; }
-        .leaderboard-modal .lb-entry .score { font-weight: 700; }
 
         .achievement-popup {
             position: fixed;
@@ -750,11 +859,12 @@
             .tray-cell { width: 1.6rem; height: 1.6rem; font-size: 1rem; }
             .tray-badge { font-size: 0.5rem; min-width: 1.6rem; }
             .trash-bin { width: 32px; height: 32px; font-size: 1rem; bottom: 35px; }
-            .item { width: 3rem; height: 3rem; font-size: 1.8rem; }
+            .item { width: 2.6rem; height: 2.6rem; font-size: 1.6rem; flex-shrink: 0; flex-grow: 0; }
             .stat-pill { font-size: 0.7rem; padding: 0.1rem 0.5rem; }
         }
         @media (max-width: 400px) {
             .level-grid { grid-template-columns: repeat(5, 1fr); }
+            .item { width: 2.2rem; height: 2.2rem; font-size: 1.2rem; }
         }
 
         .settings-icon {
@@ -827,15 +937,6 @@
             color: #2D1A12;
         }
         .pause-btn:hover { background: #E4D5C8; }
-        .hidden { display: none !important; }
-
-        .item-belt.speed-burst .item {
-            animation: speedPulse 0.3s ease-in-out infinite alternate;
-        }
-        @keyframes speedPulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05); }
-        }
 
         @keyframes victoryPulse {
             0% { opacity:0; transform:scale(0.8); }
@@ -857,7 +958,7 @@
             <button class="btn" id="startBtn">▶ START GAME</button>
         </div>
         <div style="text-align:center;font-size:0.8rem;opacity:0.4;margin-top:1rem;color:#2D1A12;">
-            🧊 Spoilage • 🗑️ Junk • ⚡ Speed Burst • ⭐ 3-Star Gates
+            🧊 Spoilage • 🗑️ Junk • ⭐ 3-Star Gates • 💣 Bomb • 🧊 Ice • 🍇 Grape
         </div>
     </div>
 
@@ -865,10 +966,7 @@
     <div id="categoryPage" class="page hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
             <h2 style="font-weight:700; font-size:1.5rem; color:#2D1A12;">📂 CATEGORIES</h2>
-            <div style="display:flex; gap:0.5rem;">
-                <button class="btn-icon" id="leaderboardBtn" style="font-size:1.2rem;">🏆</button>
-                <button class="btn-icon" id="settingsToggle" style="font-size:1.2rem;">⚙️</button>
-            </div>
+            <button class="btn-icon" id="settingsToggle" style="font-size:1.2rem;">⚙️</button>
         </div>
         <div id="settingsPanel" class="settings-panel hidden">
             <div class="settings-row"><label>🔊 Sound</label><button id="soundToggleSettings">ON</button></div>
@@ -929,7 +1027,7 @@
         </div>
         <div class="progress-bar"><div class="progress-fill" id="gameProgress"></div></div>
 
-        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Drag junk to trash bin</div>
+        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Junk to trash (+5s) · 💣 Bomb = game over · 🧊 Ice = freeze 5s · 🍇 Grape = 3× points</div>
 
         <div class="item-belt" id="gameItems"></div>
 
@@ -951,7 +1049,21 @@
         </div>
     </div>
 
-    <!-- RESULT MODAL -->
+    <!-- OVERLAYS FOR POWER-UPS -->
+    <div class="overlay" id="freezeOverlay">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <span>❄️❄️❄️</span>
+            <span class="label" id="freezeTimerLabel">⏳ 5s</span>
+        </div>
+    </div>
+    <div class="overlay bomb" id="bombOverlay">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <span>💥💣💥</span>
+            <span class="label">💥 BOOM! GAME OVER 💥</span>
+        </div>
+    </div>
+
+    <!-- MODAL -->
     <div class="modal-overlay" id="resultModal">
         <div class="modal-card">
             <h1 id="resultTitle">🏆</h1>
@@ -959,6 +1071,7 @@
             <div class="stats-row" style="display:flex;gap:0.8rem;justify-content:center;margin:0.5rem 0;">
                 <div class="stat-card">⭐ <span id="finalScore">0</span></div>
                 <div class="stat-card">⏱️ <span id="timeBonus">0</span></div>
+                <div class="stat-card">⏳ <span id="remainingTimeDisplay">0</span>s left</div>
             </div>
             <div class="star-display" id="starDisplay">☆☆☆</div>
             <div class="coins-earned-display">🪙 Coins Earned: <span id="coinsEarned">0</span></div>
@@ -969,23 +1082,10 @@
         </div>
     </div>
 
-    <!-- LEADERBOARD MODAL -->
-    <div class="modal-overlay leaderboard-modal" id="leaderboardModal">
-        <div class="modal-card">
-            <h2>🏆 LEADERBOARD</h2>
-            <div id="leaderboardList" style="margin:1rem 0; max-height:300px; overflow-y:auto;"></div>
-            <div style="display:flex; gap:0.5rem; justify-content:center;">
-                <button class="btn-small" id="lbCloseBtn">Close</button>
-                <button class="btn-small" id="lbRefreshBtn">🔄 Refresh</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         (function() {
             'use strict';
 
-            // ---------- SECURITY ----------
             document.addEventListener('contextmenu', e => e.preventDefault());
             document.addEventListener('keydown', e => {
                 if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
@@ -993,7 +1093,6 @@
                 }
             });
 
-            // ---------- AUDIO ----------
             let audioContext = null;
             let soundEnabled = true;
 
@@ -1030,17 +1129,18 @@
                     setTimeout(() => playBeep(880, 0.25), 180); }, 550);
             }
             function playClickSound() { playBeep(880, 0.05, 0.1); }
-            function playSpeedBurstSound() { playBeep(1000, 0.05, 0.1);
-                setTimeout(() => playBeep(1200, 0.05, 0.1), 80);
-                setTimeout(() => playBeep(1400, 0.08, 0.1), 160); }
             function playCoinSound() { playBeep(880, 0.05, 0.15);
                 setTimeout(() => playBeep(1100, 0.05, 0.15), 80);
                 setTimeout(() => playBeep(1320, 0.08, 0.15), 160); }
             function playAchievementSound() { playBeep(523, 0.1);
                 setTimeout(() => playBeep(659, 0.1), 100);
                 setTimeout(() => playBeep(784, 0.15), 200); }
+            function playBombSound() { playBeep(150, 0.5, 0.3);
+                setTimeout(() => playBeep(100, 0.8, 0.3), 200); }
+            function playFreezeSound() { playBeep(600, 0.1);
+                setTimeout(() => playBeep(800, 0.1), 150);
+                setTimeout(() => playBeep(1000, 0.2), 300); }
 
-            // ---------- CONFIG ----------
             const CONFIG = {
                 POINTS_PER_ITEM: 10,
                 PENALTY_PER_MISTAKE: 5,
@@ -1049,158 +1149,14 @@
                 RETRY_COST: 1,
                 JUNK_ITEMS: ['🧹', '🗑️', '🧊', '💣', '🧽'],
                 GOLDEN_CHANCE: 0.08,
-                MAX_PARTICLES: 50
+                MAX_PARTICLES: 50,
+                BELT_SIZE: 8,
+                JUNK_BONUS_SECONDS: 5,
+                POWERUP_BOMB_CHANCE: 0.04,
+                POWERUP_ICE_CHANCE: 0.04,
+                POWERUP_GRAPE_CHANCE: 0.04
             };
 
-            // ---------- API CONFIGURATION ----------
-            // Auto-detect environment
-            const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                ? 'http://localhost:5000'
-                : 'https://fridgeflow-api.onrender.com'; // ← CHANGE TO YOUR RENDER URL
-
-            // Generate unique player ID
-            let playerId = localStorage.getItem('playerId');
-            if (!playerId) {
-                playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-                localStorage.setItem('playerId', playerId);
-            }
-
-            // ===== LEADERBOARD FUNCTIONS =====
-            function getLeaderboard() {
-                try {
-                    const data = localStorage.getItem('fridgeflow_leaderboard');
-                    return data ? JSON.parse(data) : [];
-                } catch { return []; }
-            }
-
-            function saveLeaderboard(entries) {
-                localStorage.setItem('fridgeflow_leaderboard', JSON.stringify(entries));
-            }
-
-            function renderLeaderboard() {
-                const lb = getLeaderboard();
-                const container = document.getElementById('leaderboardList');
-                if (!container) return;
-                
-                if (lb.length === 0) {
-                    container.innerHTML = '<div style="text-align:center;opacity:0.6;">No scores yet. Be the first!</div>';
-                    return;
-                }
-                
-                let html = '';
-                lb.forEach((entry, index) => {
-                    const rank = index + 1;
-                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                    html += `<div class="lb-entry"><span class="rank">${medal}</span><span class="name">${entry.name}</span><span class="score">${entry.score}</span></div>`;
-                });
-                container.innerHTML = html;
-            }
-
-            // ===== CLOUD SAVE FUNCTIONS =====
-
-            async function saveProgressToCloud() {
-                try {
-                    const dataToSave = {
-                        wins: state.wins,
-                        losses: state.losses,
-                        levels: state.levels,
-                        completedLevels: state.completedLevels,
-                        totalCoins: state.totalCoins,
-                        achievements: achievements
-                    };
-                    
-                    const response = await fetch(`${API_URL}/api/save-progress`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            playerId: playerId,
-                            data: dataToSave
-                        })
-                    });
-                    const result = await response.json();
-                    return result.success;
-                } catch (error) {
-                    console.log('Cloud save failed:', error);
-                    return false;
-                }
-            }
-
-            async function loadProgressFromCloud() {
-                try {
-                    const response = await fetch(`${API_URL}/api/load-progress?playerId=${playerId}`);
-                    const result = await response.json();
-                    if (result.success && result.data) {
-                        return result.data;
-                    }
-                    return null;
-                } catch (error) {
-                    console.log('Cloud load failed:', error);
-                    return null;
-                }
-            }
-
-            async function submitScoreToCloud(name, score, gameName = 'fridge-flow') {
-                try {
-                    const response = await fetch(`${API_URL}/api/save-score`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            playerName: name,
-                            score: Math.round(score),
-                            gameName: gameName
-                        })
-                    });
-                    const result = await response.json();
-                    return result.success;
-                } catch (error) {
-                    console.log('Score submit failed:', error);
-                    return false;
-                }
-            }
-
-            async function getLeaderboardFromCloud(gameName = 'fridge-flow') {
-                try {
-                    const response = await fetch(`${API_URL}/api/get-scores?game=${gameName}&limit=50`);
-                    const result = await response.json();
-                    if (result.success) {
-                        return result.scores;
-                    }
-                    return [];
-                } catch (error) {
-                    console.log('Leaderboard load failed:', error);
-                    return [];
-                }
-            }
-
-            // ===== SYNC FROM CLOUD =====
-            async function syncFromCloud() {
-                try {
-                    const cloudData = await loadProgressFromCloud();
-                    if (cloudData) {
-                        // Merge cloud data with state
-                        if (cloudData.wins) Object.assign(state.wins, cloudData.wins);
-                        if (cloudData.losses) Object.assign(state.losses, cloudData.losses);
-                        if (cloudData.levels) Object.assign(state.levels, cloudData.levels);
-                        if (cloudData.completedLevels) Object.assign(state.completedLevels, cloudData.completedLevels);
-                        if (cloudData.totalCoins !== undefined) state.totalCoins = cloudData.totalCoins;
-                        if (cloudData.achievements) Object.assign(achievements, cloudData.achievements);
-                        
-                        updateStatsUI();
-                        checkAchievements(state);
-                        renderLeaderboard();
-                        console.log('✅ Progress synced from cloud!');
-                    } else {
-                        // No cloud data - push local data
-                        await saveProgressToCloud();
-                        console.log('📤 Local data pushed to cloud');
-                    }
-                } catch (error) {
-                    console.log('Cloud sync failed:', error);
-                    // Continue with localStorage data
-                }
-            }
-
-            // ---------- ACHIEVEMENTS ----------
             const ACHIEVEMENTS = {
                 first_win: { id: 'first_win', name: '🍎 First Stock', desc: 'Complete your first level', unlocked: false },
                 three_star: { id: 'three_star', name: '⭐ Star Collector', desc: 'Get 3 stars on any level',
@@ -1283,13 +1239,11 @@
                 document.getElementById('achievementCount').textContent = count;
             }
 
-            // ---------- GATEKEEPER COSTS ----------
             const GATEKEEPER_COSTS = {
                 6: 6, 11: 10, 16: 20, 21: 35, 26: 45, 31: 60, 36: 80,
                 41: 100, 46: 135, 51: 150, 56: 175, 61: 195, 66: 230
             };
 
-            // ---------- LEVEL CONFIG ----------
             function isGatekeeperLevel(level) {
                 return [6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56, 61, 66].includes(level);
             }
@@ -1391,7 +1345,6 @@
                     ], name: 'Sweets', emoji: '🍦' }
             };
 
-            // ---------- STATE ----------
             let state = {
                 wins: { fruit: 0, veg: 0, drink: 0, fastfood: 0, sweets: 0 },
                 losses: { fruit: 0, veg: 0, drink: 0, fastfood: 0, sweets: 0 },
@@ -1414,17 +1367,20 @@
                 earnedStars: 0,
                 junkCount: 0,
                 correctDrops: 0,
-                speedBurstActive: false,
-                speedBurstTimer: null,
                 totalSpoiled: 0,
                 levelCoinsEarned: 0,
                 mistakes: 0,
                 gatekeeperPassed: false,
                 perfectLevel: false,
-                totalJunkDiscarded: 0
+                totalJunkDiscarded: 0,
+                // Freeze state
+                isFrozen: false,
+                freezeTimeout: null,
+                freezeTimerInterval: null,
+                freezeRemaining: 0,
+                powerups: { slowTime: 0, magnet: 0, freeze: 0 }
             };
 
-            // Load from localStorage
             try {
                 const saved = localStorage.getItem('fridgeflow_advanced_progress');
                 if (saved) {
@@ -1433,11 +1389,15 @@
                 }
             } catch (e) {}
 
-            let drag = { active: false, item: null, emoji: null, ghost: null, isJunk: false, isGolden: false };
+            let drag = { active: false, item: null, emoji: null, ghost: null, isJunk: false, isGolden: false, isBomb: false,
+                isIce: false, isGrape: false };
             let activeParticles = 0;
-            let retryCostPaid = false;
 
-            // ---------- PARTICLES ----------
+            // DOM refs for overlays
+            const freezeOverlay = document.getElementById('freezeOverlay');
+            const bombOverlay = document.getElementById('bombOverlay');
+            const freezeTimerLabel = document.getElementById('freezeTimerLabel');
+
             function initBackgroundParticles() {
                 const container = document.getElementById('particles-bg');
                 for (let i = 0; i < 30; i++) {
@@ -1520,7 +1480,6 @@
                 setTimeout(() => body.classList.remove('shake'), 300);
             }
 
-            // ---------- HELPERS ----------
             function calculateCoinsEarned(level) {
                 return CONFIG.BASE_COINS;
             }
@@ -1540,35 +1499,12 @@
                 return 0;
             }
 
-            // ===== SAVE PROGRESS (Cloud + Local) =====
             function saveProgress() {
                 try {
-                    // Save to localStorage
                     localStorage.setItem('fridgeflow_advanced_progress', JSON.stringify(state));
                 } catch (e) {}
-                
-                // Save to cloud (async - don't await to avoid blocking)
-                saveProgressToCloud();
             }
 
-            // ===== SUBMIT SCORE (Cloud + Local) =====
-            function submitScore(name, score) {
-                if (!name) name = 'Player';
-                const lb = getLeaderboard();
-                lb.push({ 
-                    name: name, 
-                    score: Math.round(score), 
-                    date: new Date().toLocaleDateString() 
-                });
-                lb.sort((a, b) => b.score - a.score);
-                if (lb.length > 50) lb.length = 50;
-                saveLeaderboard(lb);
-                
-                // Also submit to cloud
-                submitScoreToCloud(name, score);
-            }
-
-            // ---------- UI UPDATES ----------
             function updateStatsUI() {
                 const totalWins = Object.values(state.wins).reduce((a, b) => a + b, 0);
                 const totalLosses = Object.values(state.losses).reduce((a, b) => a + b, 0);
@@ -1585,7 +1521,6 @@
                 saveProgress();
             }
 
-            // ---------- UNLOCK ----------
             function unlockGatekeeperWithCoins(category, levelNum) {
                 const cost = getGatekeeperCost(levelNum);
                 if (state.totalCoins < cost) {
@@ -1615,7 +1550,6 @@
                 return true;
             }
 
-            // ---------- RENDER LEVEL GRID ----------
             function renderLevelGrid(category) {
                 const grid = document.getElementById('levelGrid');
                 if (!grid) return;
@@ -1679,14 +1613,11 @@
                 document.getElementById('completedCount').textContent = completedCount;
             }
 
-            // ---------- GAME CORE ----------
+            // ======================= GAME CORE =======================
+
             function startGameWithLevel(category, level) {
                 initAudio();
                 if (audioContext && audioContext.state === 'suspended') audioContext.resume();
-
-                if (!retryCostPaid && state.gameActive === false) {
-                    retryCostPaid = true;
-                }
 
                 state.currentCategory = category;
                 state.currentLevel = level;
@@ -1701,9 +1632,14 @@
                 state.mistakes = 0;
                 state.perfectLevel = false;
                 state.gatekeeperPassed = false;
-                state.speedBurstActive = false;
-                if (state.speedBurstTimer) { clearTimeout(state.speedBurstTimer);
-                    state.speedBurstTimer = null; }
+                state.earnedStars = 0;
+                state.isFrozen = false;
+                if (state.freezeTimeout) { clearTimeout(state.freezeTimeout);
+                    state.freezeTimeout = null; }
+                if (state.freezeTimerInterval) { clearInterval(state.freezeTimerInterval);
+                    state.freezeTimerInterval = null; }
+                freezeOverlay.classList.remove('active');
+                bombOverlay.classList.remove('active');
                 if (state.spoilageInterval) { clearInterval(state.spoilageInterval);
                     state.spoilageInterval = null; }
                 if (state.timerInterval) clearInterval(state.timerInterval);
@@ -1744,8 +1680,13 @@
                 fillItemQueue(config);
                 updateItemBelt();
 
+                if (state.itemQueue.length === 0) {
+                    fillItemQueue(config);
+                    updateItemBelt();
+                }
+
                 const door = document.getElementById('door');
-                door.classList.remove('open');
+                door.classList.add('open');
                 door.onclick = () => door.classList.toggle('open');
 
                 const trashBin = document.getElementById('trashBin');
@@ -1773,14 +1714,23 @@
                 const selectedItems = shuffledItems.slice(0, numContainers);
 
                 let rows = [];
-                if (numContainers === 2) rows = [2];
-                else if (numContainers === 3) rows = [3];
-                else if (numContainers === 4) rows = [2, 2];
-                else if (numContainers === 5) rows = [3, 2];
-                else if (numContainers === 6) rows = [3, 3];
-                else rows = [2, 2];
+                if (numContainers === 2) {
+                    rows = [2];
+                } else if (numContainers === 3) {
+                    rows = [3];
+                } else if (numContainers === 4) {
+                    rows = [2, 2];
+                } else if (numContainers === 5) {
+                    rows = [3, 2];
+                } else if (numContainers === 6) {
+                    rows = [3, 3];
+                } else {
+                    rows = [2, 2];
+                }
 
-                if (reposition && rows.length > 1) rows = rows.reverse();
+                if (reposition && rows.length > 1) {
+                    rows = rows.reverse();
+                }
 
                 let trayIndex = 0;
                 for (let row = 0; row < rows.length; row++) {
@@ -1791,8 +1741,11 @@
                     for (let i = 0; i < numInRow && trayIndex < selectedItems.length; i++) {
                         const pos = i === 0 ? 'left' : (i === numInRow - 1 ? 'right' : 'center');
                         const shelf = createShelf(selectedItems[trayIndex], pos, itemsPerContainer);
-                        if (numInRow === 3) shelf.style.width = '31%';
-                        else if (numInRow > 3) shelf.style.width = '31%';
+                        if (numInRow === 3) {
+                            shelf.style.width = '31%';
+                        } else if (numInRow > 3) {
+                            shelf.style.width = '31%';
+                        }
                         rowDiv.appendChild(shelf);
                         const trayObj = {
                             el: shelf,
@@ -1835,21 +1788,46 @@
 
                 const junkChance = config.junkEnabled ? 0.1 : 0;
                 const goldenChance = CONFIG.GOLDEN_CHANCE;
+                const bombChance = CONFIG.POWERUP_BOMB_CHANCE;
+                const iceChance = CONFIG.POWERUP_ICE_CHANCE;
+                const grapeChance = CONFIG.POWERUP_GRAPE_CHANCE;
 
+                const needed = Math.max(CONFIG.BELT_SIZE + 6, 14);
                 state.itemQueue = [];
-                const queueLength = 14;
-                for (let i = 0; i < queueLength; i++) {
-                    if (Math.random() < goldenChance) {
-                        const rand = available[Math.floor(Math.random() * available.length)];
-                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: true });
+                for (let i = 0; i < needed; i++) {
+                    // Check for power-ups first (mutually exclusive)
+                    let roll = Math.random();
+                    if (roll < bombChance) {
+                        state.itemQueue.push({ emoji: '💣', isJunk: false, isGolden: false, isBomb: true, isIce: false,
+                            isGrape: false });
                         continue;
                     }
-                    if (Math.random() < junkChance) {
+                    roll -= bombChance;
+                    if (roll < iceChance) {
+                        state.itemQueue.push({ emoji: '🧊', isJunk: false, isGolden: false, isBomb: false, isIce: true,
+                            isGrape: false });
+                        continue;
+                    }
+                    roll -= iceChance;
+                    if (roll < grapeChance) {
+                        state.itemQueue.push({ emoji: '🍇', isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: true });
+                        continue;
+                    }
+
+                    // Regular items
+                    if (Math.random() < goldenChance) {
+                        const rand = available[Math.floor(Math.random() * available.length)];
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: true, isBomb: false, isIce: false,
+                            isGrape: false });
+                    } else if (Math.random() < junkChance) {
                         const junk = CONFIG.JUNK_ITEMS[Math.floor(Math.random() * CONFIG.JUNK_ITEMS.length)];
-                        state.itemQueue.push({ emoji: junk, isJunk: true, isGolden: false });
+                        state.itemQueue.push({ emoji: junk, isJunk: true, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: false });
                     } else {
                         const rand = available[Math.floor(Math.random() * available.length)];
-                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false });
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: false });
                     }
                 }
             }
@@ -1862,52 +1840,75 @@
 
                 const available = state.trays.filter(t => t.current < t.max && !t.poisoned);
                 if (available.length === 0) {
-                    belt.innerHTML = '<div style="opacity:0.5; color:#2D1A12;">✨ All full! ✨</div>';
+                    belt.style.display = 'none';
                     return;
                 }
 
-                if (state.speedBurstActive) belt.classList.add('speed-burst');
-                else belt.classList.remove('speed-burst');
+                if (state.itemQueue.length < CONFIG.BELT_SIZE) {
+                    fillItemQueue(getLevelConfig(state.currentLevel));
+                }
 
-                const displayCount = state.speedBurstActive ? 10 : 8;
-                const displayItems = state.itemQueue.slice(0, displayCount);
+                if (state.itemQueue.length === 0 && available.length > 0) {
+                    const rand = available[Math.floor(Math.random() * available.length)];
+                    state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                        isGrape: false });
+                }
+
+                belt.style.display = 'flex';
+
+                const displayItems = state.itemQueue.slice(0, CONFIG.BELT_SIZE);
 
                 displayItems.forEach(item => {
                     const el = document.createElement('span');
                     el.className = 'item';
                     if (item.isJunk) el.classList.add('junk');
                     if (item.isGolden) el.classList.add('golden');
+                    if (item.isBomb) el.classList.add('bomb');
+                    if (item.isIce) el.classList.add('ice');
+                    if (item.isGrape) el.classList.add('grape');
                     el.textContent = item.emoji;
                     el._isJunk = item.isJunk || false;
                     el._isGolden = item.isGolden || false;
+                    el._isBomb = item.isBomb || false;
+                    el._isIce = item.isIce || false;
+                    el._isGrape = item.isGrape || false;
 
                     el.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
-                        startDrag(el, item.emoji, e.clientX, e.clientY, item.isJunk, item.isGolden);
+                        startDrag(el, item.emoji, e.clientX, e.clientY, item.isJunk, item.isGolden, item.isBomb,
+                            item.isIce, item.isGrape);
                     });
                     belt.appendChild(el);
                 });
             }
 
-            function startDrag(item, emoji, x, y, isJunk = false, isGolden = false) {
+            // ---------- DRAG ----------
+            function startDrag(item, emoji, x, y, isJunk = false, isGolden = false, isBomb = false, isIce = false,
+            isGrape = false) {
                 if (!state.gameActive || state.gameWon || state.isPaused) return;
                 drag.active = true;
                 drag.item = item;
                 drag.emoji = emoji;
                 drag.isJunk = isJunk;
                 drag.isGolden = isGolden;
+                drag.isBomb = isBomb;
+                drag.isIce = isIce;
+                drag.isGrape = isGrape;
 
                 drag.ghost = document.createElement('div');
                 drag.ghost.className = 'drag-ghost';
                 if (isJunk) drag.ghost.classList.add('junk');
                 if (isGolden) drag.ghost.classList.add('golden');
+                if (isBomb) drag.ghost.classList.add('bomb');
+                if (isIce) drag.ghost.classList.add('ice');
+                if (isGrape) drag.ghost.classList.add('grape');
                 drag.ghost.textContent = emoji;
                 document.body.appendChild(drag.ghost);
                 drag.ghost.style.left = x + 'px';
                 drag.ghost.style.top = y + 'px';
                 item.style.opacity = '0.3';
 
-                if (!isJunk) {
+                if (!isJunk && !isBomb && !isIce && !isGrape) {
                     state.trays.forEach(tray => {
                         if (tray.emoji === emoji && tray.current < tray.max && !tray.poisoned)
                             tray.el.classList.add('highlight');
@@ -1915,8 +1916,11 @@
                 }
 
                 const trashBin = document.getElementById('trashBin');
-                if (isJunk) trashBin.classList.add('active');
-                else trashBin.classList.remove('active');
+                if (isJunk || isIce) {
+                    trashBin.classList.add('active');
+                } else {
+                    trashBin.classList.remove('active');
+                }
             }
 
             document.addEventListener('pointermove', (e) => {
@@ -1927,7 +1931,9 @@
             });
 
             document.addEventListener('pointerup', (e) => {
-                if (drag.active) endDrag(e.clientX, e.clientY);
+                if (drag.active) {
+                    endDrag(e.clientX, e.clientY);
+                }
             });
 
             function endDrag(x, y) {
@@ -1940,25 +1946,105 @@
                 const isOnTrash = x >= trashRect.left && x <= trashRect.right &&
                     y >= trashRect.top && y <= trashRect.bottom;
 
+                // === BOMB HANDLING ============================================
+                if (drag.isBomb) {
+                    // Drop anywhere -> explosion -> game over
+                    showFloatingText(x, y - 30, '💥 BOOM!', '#FF0000');
+                    burstParticles(x, y, 40, 0);
+                    playBombSound();
+                    if (navigator.vibrate) navigator.vibrate([100, 200, 100]);
+
+                    // Show bomb overlay briefly
+                    bombOverlay.classList.add('active');
+                    setTimeout(() => {
+                        bombOverlay.classList.remove('active');
+                    }, 1500);
+
+                    if (drag.item && drag.item.parentNode) drag.item.remove();
+                    const idx = state.itemQueue.findIndex(i => i.isBomb);
+                    if (idx !== -1) state.itemQueue.splice(idx, 1);
+                    updateItemBelt();
+                    cleanupDrag();
+
+                    // End game as loss
+                    endGame('loss');
+                    return;
+                }
+
+                // === ICE HANDLING ============================================
+                if (drag.isIce) {
+                    if (isOnTrash) {
+                        // Activate freeze
+                        showFloatingText(x, y - 30, '🧊 FREEZE!', '#4A90D9');
+                        burstParticles(x, y, 20, 200);
+                        playFreezeSound();
+                        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+                        if (drag.item && drag.item.parentNode) drag.item.remove();
+                        const idx = state.itemQueue.findIndex(i => i.isIce);
+                        if (idx !== -1) state.itemQueue.splice(idx, 1);
+                        updateItemBelt();
+                        cleanupDrag();
+                        activateFreeze();
+                        return;
+                    } else {
+                        // Ice dropped on shelf – freeze that shelf for 5 seconds (stop spoilage)
+                        const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
+                        'shelf'));
+                        if (targetEl) {
+                            const tray = state.trays.find(t => t.el === targetEl);
+                            if (tray) {
+                                // Freeze this single tray
+                                showFloatingText(x, y - 30, '🧊 SHELF FROZEN!', '#4A90D9');
+                                burstParticles(x, y, 15, 200);
+                                playFreezeSound();
+                                // Mark tray as frozen (no spoilage for 5s)
+                                tray.isFrozen = true;
+                                if (tray.freezeTimeout) clearTimeout(tray.freezeTimeout);
+                                tray.freezeTimeout = setTimeout(() => {
+                                    tray.isFrozen = false;
+                                    tray.freezeTimeout = null;
+                                    showFloatingText(x, y - 30, '❄️ Thawed!', '#4A90D9');
+                                }, 5000);
+                                // Remove ice from queue
+                                if (drag.item && drag.item.parentNode) drag.item.remove();
+                                const idx2 = state.itemQueue.findIndex(i => i.isIce);
+                                if (idx2 !== -1) state.itemQueue.splice(idx2, 1);
+                                updateItemBelt();
+                                cleanupDrag();
+                                return;
+                            }
+                        }
+                        // If dropped elsewhere, treat as miss (but not game over)
+                        // fall through to regular miss handling
+                    }
+                }
+
+                // === JUNK / FOOD / GRAPE handling ============================
+
+                // JUNK DROPPED ON TRASH
                 if (drag.isJunk && isOnTrash) {
                     state.junkCount++;
                     state.totalJunkDiscarded++;
                     document.getElementById('junkCount').textContent = state.junkCount;
-                    showFloatingText(x, y - 30, '🗑️ DISCARDED', '#A47864');
+                    showFloatingText(x, y - 30, '🗑️ DISCARDED +5s', '#A47864');
                     burstParticles(x, y, 8, 20);
                     playClickSound();
                     playCoinSound();
 
+                    state.timeLeft = Math.min(state.timeLeft + CONFIG.JUNK_BONUS_SECONDS, state.levelStartTime);
+                    document.getElementById('gameTime').textContent = state.timeLeft;
+
                     if (drag.item && drag.item.parentNode) drag.item.remove();
                     const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk);
                     if (idx !== -1) state.itemQueue.splice(idx, 1);
-                    if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
                     updateItemBelt();
                     cleanupDrag();
                     checkAchievements(state);
                     return;
                 }
 
+                // JUNK DROPPED ON SHELF (poison)
                 if (drag.isJunk) {
                     const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
                     'shelf'));
@@ -1984,7 +2070,6 @@
                             const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag
                             .isJunk);
                             if (idx !== -1) state.itemQueue.splice(idx, 1);
-                            if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
                             updateItemBelt();
                             updateProgressBar();
                             cleanupDrag();
@@ -1995,11 +2080,13 @@
                     }
                 }
 
+                // FOOD OR GRAPE DROPPED ON SHELF
                 const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
-                if (targetEl && !drag.isJunk) {
+                if (targetEl && !drag.isJunk && !drag.isBomb && !drag.isIce) {
                     const tray = state.trays.find(t => t.el === targetEl);
-                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state
-                        .gameWon && !state.isPaused) {
+                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state.gameWon &&
+                        !state.isPaused) {
+                        // SUCCESS
                         tray.current++;
                         tray.badge.textContent = `${tray.current}/${tray.max}`;
                         tray.spoilageTimer = tray.maxSpoilage;
@@ -2023,19 +2110,24 @@
                             showFloatingText(x, y - 60, '✨ GOLDEN! x2', '#FFD700');
                             burstParticles(x, y, 20, 45);
                         }
+                        if (drag.isGrape) {
+                            points *= 3; // Grape gives 3x
+                            showFloatingText(x, y - 60, '🍇 GRAPE! x3', '#6A1B9A');
+                            burstParticles(x, y, 25, 280);
+                        }
                         state.currentScore += points;
                         document.getElementById('gameScore').textContent = state.currentScore;
                         document.getElementById('comboDisplay').textContent = `x${multiplier}`;
 
-                        const color = multiplier >= 4 ? '#ffd700' : (multiplier >= 2 ? '#ffe66d' : '#8BA888');
+                        const color = drag.isGrape ? '#6A1B9A' : (multiplier >= 4 ? '#ffd700' : (multiplier >= 2 ?
+                            '#ffe66d' : '#8BA888'));
                         showFloatingText(x, y - 30, `+${points} x${multiplier}`, color);
                         burstParticles(x, y, 14, 30);
 
                         if (drag.item && drag.item.parentNode) drag.item.remove();
                         const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
-                            i.isGolden === drag.isGolden);
+                            i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
                         if (idx !== -1) state.itemQueue.splice(idx, 1);
-                        if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
                         updateItemBelt();
                         updateProgressBar();
                         playCorrectSound();
@@ -2043,25 +2135,46 @@
 
                         if (state.combo >= 5) checkAchievements(state);
 
-                        if (state.correctDrops % 5 === 0) triggerSpeedBurst();
-
                         if (state.trays.every(t => t.current >= t.max || t.poisoned)) endGame('win');
                     } else {
+                        // FAILURE: Wrong item or shelf full / poisoned
                         state.combo = 0;
                         state.mistakes++;
                         document.getElementById('comboDisplay').textContent = 'x1';
                         state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
                         document.getElementById('gameScore').textContent = state.currentScore;
                         shakeFridge();
-                        if (tray && tray.poisoned) {
+
+                        // Remove 2 items from shelf if possible
+                        if (tray && !tray.poisoned && tray.current > 0) {
+                            const removeCount = Math.min(2, tray.current);
+                            tray.current -= removeCount;
+                            tray.badge.textContent = `${tray.current}/${tray.max}`;
+                            if (tray.current < tray.max) {
+                                tray.el.classList.remove('hidden-tray');
+                                tray.el.classList.remove('full');
+                            }
+                            showFloatingText(x, y - 30, `-${removeCount} ITEMS!`, '#BF5722');
+                            burstParticles(x, y, 12, 0);
+                        } else if (tray && tray.poisoned) {
                             showFloatingText(x, y - 30, '☠️ SHELF POISONED!', '#BF5722');
+                        } else if (tray && tray.current >= tray.max) {
+                            showFloatingText(x, y - 30, 'FULL!', '#BF5722');
                         } else {
                             showFloatingText(x, y - 30, 'WRONG!', '#BF5722');
                         }
                         playWrongSound();
                         if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+                        if (drag.item && drag.item.parentNode) drag.item.remove();
+                        const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
+                            i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
+                        if (idx !== -1) state.itemQueue.splice(idx, 1);
+                        updateItemBelt();
+                        updateProgressBar();
                     }
-                } else if (!drag.isJunk) {
+                } else if (!drag.isJunk && !drag.isBomb && !drag.isIce) {
+                    // Dropped outside any shelf – treat as miss
                     state.combo = 0;
                     state.mistakes++;
                     document.getElementById('comboDisplay').textContent = 'x1';
@@ -2071,10 +2184,64 @@
                     showFloatingText(x, y - 30, 'MISS!', '#BF5722');
                     playWrongSound();
                     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+                    if (drag.item && drag.item.parentNode) drag.item.remove();
+                    const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
+                        i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
+                    if (idx !== -1) state.itemQueue.splice(idx, 1);
+                    updateItemBelt();
                 }
 
                 cleanupDrag();
                 document.getElementById('trashBin').classList.remove('active');
+            }
+
+            function activateFreeze() {
+                if (state.isFrozen) return; // already frozen
+                state.isFrozen = true;
+                state.freezeRemaining = 5;
+                freezeOverlay.classList.add('active');
+                freezeTimerLabel.textContent = `⏳ ${state.freezeRemaining}s`;
+
+                // Pause timer and spoilage
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+
+                // Countdown
+                if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                state.freezeTimerInterval = setInterval(() => {
+                    state.freezeRemaining--;
+                    freezeTimerLabel.textContent = `⏳ ${state.freezeRemaining}s`;
+                    if (state.freezeRemaining <= 0) {
+                        // End freeze
+                        clearInterval(state.freezeTimerInterval);
+                        state.freezeTimerInterval = null;
+                        freezeOverlay.classList.remove('active');
+                        state.isFrozen = false;
+                        // Resume timers
+                        startTimer();
+                        if (getLevelConfig(state.currentLevel).spoilageEnabled) {
+                            startSpoilageTimer();
+                        }
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, '❄️ Thawed!', '#4A90D9');
+                    }
+                }, 1000);
+
+                // Also auto-end after 5s via timeout
+                if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                state.freezeTimeout = setTimeout(() => {
+                    if (state.isFrozen) {
+                        clearInterval(state.freezeTimerInterval);
+                        state.freezeTimerInterval = null;
+                        freezeOverlay.classList.remove('active');
+                        state.isFrozen = false;
+                        startTimer();
+                        if (getLevelConfig(state.currentLevel).spoilageEnabled) {
+                            startSpoilageTimer();
+                        }
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, '❄️ Thawed!', '#4A90D9');
+                    }
+                }, 5000);
             }
 
             function cleanupDrag() {
@@ -2087,22 +2254,9 @@
                 drag.ghost = null;
                 drag.isJunk = false;
                 drag.isGolden = false;
-            }
-
-            function triggerSpeedBurst() {
-                if (state.speedBurstActive) return;
-                state.speedBurstActive = true;
-                playSpeedBurstSound();
-                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚡ SPEED BURST!', '#E8A14A');
-                document.getElementById('gameItems').classList.add('speed-burst');
-
-                if (state.speedBurstTimer) clearTimeout(state.speedBurstTimer);
-                state.speedBurstTimer = setTimeout(() => {
-                    state.speedBurstActive = false;
-                    document.getElementById('gameItems').classList.remove('speed-burst');
-                    updateItemBelt();
-                }, 5000);
-                updateItemBelt();
+                drag.isBomb = false;
+                drag.isIce = false;
+                drag.isGrape = false;
             }
 
             function updateProgressBar() {
@@ -2112,12 +2266,15 @@
                 document.getElementById('gameProgress').style.width = `${percent}%`;
             }
 
+            // ---------- SPOILAGE ----------
             function startSpoilageTimer() {
                 if (state.spoilageInterval) clearInterval(state.spoilageInterval);
                 state.spoilageInterval = setInterval(() => {
-                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+                    if (!state.gameActive || state.gameWon || state.isPaused || state.isFrozen) return;
 
                     state.trays.forEach(tray => {
+                        // Skip if frozen individually
+                        if (tray.isFrozen) return;
                         if (tray.current >= tray.max || tray.poisoned) return;
 
                         tray.spoilageTimer -= 1;
@@ -2144,6 +2301,9 @@
                             if (tray.current > 0) {
                                 tray.current--;
                                 tray.badge.textContent = `${tray.current}/${tray.max}`;
+                                if (tray.current < tray.max) {
+                                    tray.el.classList.remove('hidden-tray');
+                                }
                                 state.totalSpoiled++;
                                 state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
                                 document.getElementById('gameScore').textContent = state.currentScore;
@@ -2170,6 +2330,8 @@
                                         barEl.className = 'spoilage-bar'; }
                                     tray.spoilageTimer = tray.maxSpoilage;
                                 }
+
+                                updateItemBelt();
                             } else {
                                 tray.spoilageTimer = tray.maxSpoilage * 0.5;
                             }
@@ -2179,10 +2341,11 @@
                 }, 1000);
             }
 
+            // ---------- TIMER ----------
             function startTimer() {
                 if (state.timerInterval) clearInterval(state.timerInterval);
                 state.timerInterval = setInterval(() => {
-                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+                    if (!state.gameActive || state.gameWon || state.isPaused || state.isFrozen) return;
                     state.timeLeft--;
                     document.getElementById('gameTime').textContent = state.timeLeft;
 
@@ -2220,17 +2383,21 @@
                     return;
                 }
                 state.totalCoins -= CONFIG.RETRY_COST;
-                retryCostPaid = true;
                 updateStatsUI();
                 startGameWithLevel(state.currentCategory, state.currentLevel);
             }
 
+            // ---------- END GAME ----------
             function endGame(result) {
                 if (!state.gameActive) return;
                 state.gameActive = false;
                 if (state.timerInterval) clearInterval(state.timerInterval);
                 if (state.spoilageInterval) clearInterval(state.spoilageInterval);
-                if (state.speedBurstTimer) clearTimeout(state.speedBurstTimer);
+                if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                freezeOverlay.classList.remove('active');
+                bombOverlay.classList.remove('active');
+                state.isFrozen = false;
                 document.body.classList.remove('low-time');
 
                 const timeBonus = Math.floor(state.timeLeft / 10) * 2;
@@ -2239,10 +2406,13 @@
                 let coinsEarned = 0;
                 const isGatekeeper = isGatekeeperLevel(state.currentLevel);
 
+                document.getElementById('remainingTimeDisplay').textContent = Math.max(0, state.timeLeft);
+
                 if (result === 'win') {
                     const level = state.currentLevel;
                     const baseCoins = calculateCoinsEarned(level);
                     stars = getStars(state.timeLeft, state.levelStartTime);
+                    state.earnedStars = stars;
                     const starBonus = getStarBonus(stars);
                     coinsEarned = baseCoins + starBonus;
 
@@ -2272,7 +2442,7 @@
 
                     let titleText = '🧊 FRIDGE MASTER!';
                     let msgText =
-                        `Level ${level} completed! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+                        `Level ${level} completed! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
 
                     if (state.mistakes === 0) msgText += '\n⭐ PERFECT! No mistakes!';
 
@@ -2280,11 +2450,11 @@
                         const cost = getGatekeeperCost(level);
                         titleText = '⭐ GATEKEEPER LEVEL!';
                         msgText =
-                            `Level ${level} completed, but you need 3 stars to unlock the next block!\nYou got ${stars} star${stars > 1 ? 's' : ''}. Retry for 3 stars or unlock with ${cost} coins!`;
+                            `Level ${level} completed, but you need 3 stars to unlock the next block!\nYou got ${stars} star${stars > 1 ? 's' : ''}. Retry for 3 stars or unlock with ${cost} coins!\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
                     } else if (isGatekeeper && stars === 3) {
                         titleText = '⭐ GATEKEEPER MASTERED!';
                         msgText =
-                            `Level ${level} completed with 3 stars! The next block is now unlocked! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+                            `Level ${level} completed with 3 stars! The next block is now unlocked! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
                         celebrateConfetti(window.innerWidth / 2, window.innerHeight / 2, 60);
                     }
 
@@ -2318,8 +2488,9 @@
                     checkAchievements(state);
                 } else {
                     state.losses[state.currentCategory]++;
-                    document.getElementById('resultTitle').textContent = '😅 OUT OF TIME, CHEF!';
-                    document.getElementById('resultMessage').textContent = 'Don\'t let the groceries spoil! Retry!';
+                    document.getElementById('resultTitle').textContent = '💥 GAME OVER!';
+                    document.getElementById('resultMessage').textContent =
+                        `Boom! You triggered a bomb or ran out of time.\n⏳ Time left: 0s`;
                     document.getElementById('coinsEarned').textContent = '0';
                     document.getElementById('gatekeeperMessage').style.display = 'none';
                     playWrongSound();
@@ -2333,7 +2504,6 @@
                 renderVictoryButtons(result === 'win', state.currentLevel, stars, isGatekeeper);
                 document.getElementById('resultModal').classList.add('show');
                 cleanupDrag();
-                retryCostPaid = false;
             }
 
             function renderVictoryButtons(isWin, level, stars, isGatekeeper) {
@@ -2360,7 +2530,6 @@
                             next.innerHTML = '➡️ NEXT ROUND ➡️';
                             next.onclick = () => {
                                 document.getElementById('resultModal').classList.remove('show');
-                                retryCostPaid = true;
                                 startGameWithLevel(state.currentCategory, level + 1);
                             };
                             container.appendChild(next);
@@ -2463,8 +2632,6 @@
                     if (confirm('Reset all progress? This cannot be undone!')) {
                         localStorage.removeItem('fridgeflow_advanced_progress');
                         localStorage.removeItem('fridgeflow_achievements');
-                        localStorage.removeItem('fridgeflow_leaderboard');
-                        localStorage.removeItem('playerId');
                         location.reload();
                     }
                 };
@@ -2489,6 +2656,11 @@
                     playClickSound();
                     if (state.timerInterval) clearInterval(state.timerInterval);
                     if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                    if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                    if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                    freezeOverlay.classList.remove('active');
+                    bombOverlay.classList.remove('active');
+                    state.isFrozen = false;
                     state.gameActive = false;
                     document.body.classList.remove('low-time');
                     showLevelPage(state.currentCategory);
@@ -2507,38 +2679,20 @@
                 document.getElementById('pauseBtn').onclick = togglePause;
                 document.getElementById('resumeBtn').onclick = togglePause;
 
-                // Leaderboard
-                document.getElementById('leaderboardBtn').onclick = () => {
-                    renderLeaderboard();
-                    document.getElementById('leaderboardModal').classList.add('show');
-                };
-                document.getElementById('lbCloseBtn').onclick = () => {
-                    document.getElementById('leaderboardModal').classList.remove('show');
-                };
-                document.getElementById('lbRefreshBtn').onclick = () => {
-                    renderLeaderboard();
-                };
-
                 setupSettings();
             }
 
-            // ---------- INIT ----------
             updateStatsUI();
             attachEvents();
             showPage('welcomePage');
 
-            // Initialize audio on first click
             document.body.addEventListener('click', function initAudioOnFirstClick() {
                 initAudio();
                 if (audioContext && audioContext.state === 'suspended') audioContext.resume();
                 document.body.removeEventListener('click', initAudioOnFirstClick);
             });
 
-            // Check achievements on load
             setTimeout(() => checkAchievements(state), 500);
-
-            // Sync from cloud after everything is loaded
-            setTimeout(syncFromCloud, 1000);
 
         })();
     </script>
