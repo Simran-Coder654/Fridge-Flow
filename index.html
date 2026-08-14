@@ -302,10 +302,7 @@
             pointer-events: none;
         }
         .fridge-door.open { transform: rotateY(150deg); }
-        /* ✅ HIDE "OPEN" TEXT WHEN DOOR IS OPEN */
-        .fridge-door.open .door-label {
-            display: none;
-        }
+        .fridge-door.open .door-label { display: none; }
         .handle {
             position: absolute;
             left: 10px;
@@ -401,7 +398,8 @@
         .shelf.poisoned { background: rgba(191,87,34,0.2) !important; border-color: #BF5722 !important; }
         .shelf.full { 
             background: rgba(139, 168, 136, 0.35) !important;
-            border-color: #8BA888 !important;
+            border-color: #4CAF50 !important;
+            border-width: 3px !important;
             animation: fullFlash 0.5s ease;
         }
         .shelf.highlight {
@@ -477,11 +475,14 @@
             justify-content: center;
             align-items: center;
             gap: 0.6rem;
-            min-height: 4rem;
+            min-height: 3.5rem;
             backdrop-filter: blur(4px);
             position: relative;
             z-index: 20;
             transition: all 0.3s;
+        }
+        .item-belt:empty {
+            display: none;
         }
         .item {
             font-size: 1.6rem;
@@ -534,6 +535,56 @@
             0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
             100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
         }
+        /* Power-up icons */
+        .item.bomb {
+            background: radial-gradient(circle at 30% 30%, #FF6B6B, #B22222) !important;
+            box-shadow: 0 4px 0 #8B0000, 0 0 20px rgba(255,0,0,0.4) !important;
+            animation: bombPulse 0.8s infinite alternate;
+        }
+        @keyframes bombPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+            100% { transform: scale(1.1); box-shadow: 0 0 30px rgba(255,0,0,0.7); }
+        }
+        .item.bomb::after {
+            content: '💣';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+        .item.ice {
+            background: radial-gradient(circle at 30% 30%, #A8E6CF, #4A90D9) !important;
+            box-shadow: 0 4px 0 #1B4F8B, 0 0 20px rgba(74,144,217,0.4) !important;
+            animation: icePulse 1s infinite alternate;
+        }
+        @keyframes icePulse {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.05) rotate(5deg); }
+        }
+        .item.ice::after {
+            content: '❄️';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+        .item.grape {
+            background: radial-gradient(circle at 30% 30%, #B39DDB, #6A1B9A) !important;
+            box-shadow: 0 4px 0 #4A148C, 0 0 20px rgba(106,27,154,0.4) !important;
+            animation: grapePulse 0.6s infinite alternate;
+        }
+        @keyframes grapePulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(106,27,154,0.3); }
+            100% { transform: scale(1.08); box-shadow: 0 0 30px rgba(106,27,154,0.7); }
+        }
+        .item.grape::after {
+            content: '🍇';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.7rem;
+        }
+
         .item:active { cursor: grabbing; }
 
         .drag-ghost {
@@ -561,6 +612,18 @@
         .drag-ghost.golden {
             border-color: #FFD700;
             background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520);
+        }
+        .drag-ghost.bomb {
+            border-color: #FF0000;
+            background: radial-gradient(circle at 30% 30%, #FF6B6B, #B22222);
+        }
+        .drag-ghost.ice {
+            border-color: #4A90D9;
+            background: radial-gradient(circle at 30% 30%, #A8E6CF, #4A90D9);
+        }
+        .drag-ghost.grape {
+            border-color: #6A1B9A;
+            background: radial-gradient(circle at 30% 30%, #B39DDB, #6A1B9A);
         }
 
         .game-header {
@@ -668,6 +731,46 @@
         @keyframes confettiFall {
             0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
             100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); }
+        }
+
+        /* Overlays for power-ups */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9996;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+            background: rgba(0,0,0,0.3);
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .overlay .label {
+            font-size: 2rem;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.6);
+            padding: 0.5rem 2rem;
+            border-radius: 40px;
+            margin-top: 1rem;
+        }
+        .overlay.freeze {
+            background: rgba(74, 144, 217, 0.2);
+        }
+        .overlay.freeze .label {
+            color: #A8E6CF;
+        }
+        .overlay.bomb {
+            background: rgba(255, 0, 0, 0.2);
+        }
+        .overlay.bomb .label {
+            color: #FF6B6B;
         }
 
         .modal-overlay {
@@ -855,7 +958,7 @@
             <button class="btn" id="startBtn">▶ START GAME</button>
         </div>
         <div style="text-align:center;font-size:0.8rem;opacity:0.4;margin-top:1rem;color:#2D1A12;">
-            🧊 Spoilage • 🗑️ Junk • ⭐ 3-Star Gates
+            🧊 Spoilage • 🗑️ Junk • ⭐ 3-Star Gates • 💣 Bomb • 🧊 Ice • 🍇 Grape
         </div>
     </div>
 
@@ -924,7 +1027,7 @@
         </div>
         <div class="progress-bar"><div class="progress-fill" id="gameProgress"></div></div>
 
-        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Drag junk to trash bin (+5s)</div>
+        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Junk to trash (+5s) · 💣 Bomb = game over · 🧊 Ice = freeze 5s · 🍇 Grape = 3× points</div>
 
         <div class="item-belt" id="gameItems"></div>
 
@@ -943,6 +1046,20 @@
                     <button class="btn-small" id="resumeBtn" style="font-size:1.2rem;padding:0.6rem 2rem;">▶️ RESUME</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- OVERLAYS FOR POWER-UPS -->
+    <div class="overlay" id="freezeOverlay">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <span>❄️❄️❄️</span>
+            <span class="label" id="freezeTimerLabel">⏳ 5s</span>
+        </div>
+    </div>
+    <div class="overlay bomb" id="bombOverlay">
+        <div style="display:flex;flex-direction:column;align-items:center;">
+            <span>💥💣💥</span>
+            <span class="label">💥 BOOM! GAME OVER 💥</span>
         </div>
     </div>
 
@@ -1018,6 +1135,11 @@
             function playAchievementSound() { playBeep(523, 0.1);
                 setTimeout(() => playBeep(659, 0.1), 100);
                 setTimeout(() => playBeep(784, 0.15), 200); }
+            function playBombSound() { playBeep(150, 0.5, 0.3);
+                setTimeout(() => playBeep(100, 0.8, 0.3), 200); }
+            function playFreezeSound() { playBeep(600, 0.1);
+                setTimeout(() => playBeep(800, 0.1), 150);
+                setTimeout(() => playBeep(1000, 0.2), 300); }
 
             const CONFIG = {
                 POINTS_PER_ITEM: 10,
@@ -1029,7 +1151,10 @@
                 GOLDEN_CHANCE: 0.08,
                 MAX_PARTICLES: 50,
                 BELT_SIZE: 8,
-                JUNK_BONUS_SECONDS: 5   // ✅ +5 seconds per junk discard
+                JUNK_BONUS_SECONDS: 5,
+                POWERUP_BOMB_CHANCE: 0.04,
+                POWERUP_ICE_CHANCE: 0.04,
+                POWERUP_GRAPE_CHANCE: 0.04
             };
 
             const ACHIEVEMENTS = {
@@ -1248,6 +1373,11 @@
                 gatekeeperPassed: false,
                 perfectLevel: false,
                 totalJunkDiscarded: 0,
+                // Freeze state
+                isFrozen: false,
+                freezeTimeout: null,
+                freezeTimerInterval: null,
+                freezeRemaining: 0,
                 powerups: { slowTime: 0, magnet: 0, freeze: 0 }
             };
 
@@ -1259,8 +1389,14 @@
                 }
             } catch (e) {}
 
-            let drag = { active: false, item: null, emoji: null, ghost: null, isJunk: false, isGolden: false };
+            let drag = { active: false, item: null, emoji: null, ghost: null, isJunk: false, isGolden: false, isBomb: false,
+                isIce: false, isGrape: false };
             let activeParticles = 0;
+
+            // DOM refs for overlays
+            const freezeOverlay = document.getElementById('freezeOverlay');
+            const bombOverlay = document.getElementById('bombOverlay');
+            const freezeTimerLabel = document.getElementById('freezeTimerLabel');
 
             function initBackgroundParticles() {
                 const container = document.getElementById('particles-bg');
@@ -1497,6 +1633,13 @@
                 state.perfectLevel = false;
                 state.gatekeeperPassed = false;
                 state.earnedStars = 0;
+                state.isFrozen = false;
+                if (state.freezeTimeout) { clearTimeout(state.freezeTimeout);
+                    state.freezeTimeout = null; }
+                if (state.freezeTimerInterval) { clearInterval(state.freezeTimerInterval);
+                    state.freezeTimerInterval = null; }
+                freezeOverlay.classList.remove('active');
+                bombOverlay.classList.remove('active');
                 if (state.spoilageInterval) { clearInterval(state.spoilageInterval);
                     state.spoilageInterval = null; }
                 if (state.timerInterval) clearInterval(state.timerInterval);
@@ -1645,21 +1788,46 @@
 
                 const junkChance = config.junkEnabled ? 0.1 : 0;
                 const goldenChance = CONFIG.GOLDEN_CHANCE;
+                const bombChance = CONFIG.POWERUP_BOMB_CHANCE;
+                const iceChance = CONFIG.POWERUP_ICE_CHANCE;
+                const grapeChance = CONFIG.POWERUP_GRAPE_CHANCE;
 
                 const needed = Math.max(CONFIG.BELT_SIZE + 6, 14);
                 state.itemQueue = [];
                 for (let i = 0; i < needed; i++) {
-                    if (Math.random() < goldenChance) {
-                        const rand = available[Math.floor(Math.random() * available.length)];
-                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: true });
+                    // Check for power-ups first (mutually exclusive)
+                    let roll = Math.random();
+                    if (roll < bombChance) {
+                        state.itemQueue.push({ emoji: '💣', isJunk: false, isGolden: false, isBomb: true, isIce: false,
+                            isGrape: false });
                         continue;
                     }
-                    if (Math.random() < junkChance) {
+                    roll -= bombChance;
+                    if (roll < iceChance) {
+                        state.itemQueue.push({ emoji: '🧊', isJunk: false, isGolden: false, isBomb: false, isIce: true,
+                            isGrape: false });
+                        continue;
+                    }
+                    roll -= iceChance;
+                    if (roll < grapeChance) {
+                        state.itemQueue.push({ emoji: '🍇', isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: true });
+                        continue;
+                    }
+
+                    // Regular items
+                    if (Math.random() < goldenChance) {
+                        const rand = available[Math.floor(Math.random() * available.length)];
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: true, isBomb: false, isIce: false,
+                            isGrape: false });
+                    } else if (Math.random() < junkChance) {
                         const junk = CONFIG.JUNK_ITEMS[Math.floor(Math.random() * CONFIG.JUNK_ITEMS.length)];
-                        state.itemQueue.push({ emoji: junk, isJunk: true, isGolden: false });
+                        state.itemQueue.push({ emoji: junk, isJunk: true, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: false });
                     } else {
                         const rand = available[Math.floor(Math.random() * available.length)];
-                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false });
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                            isGrape: false });
                     }
                 }
             }
@@ -1672,13 +1840,21 @@
 
                 const available = state.trays.filter(t => t.current < t.max && !t.poisoned);
                 if (available.length === 0) {
-                    belt.innerHTML = '<div style="opacity:0.5; color:#2D1A12;">✨ All full! ✨</div>';
+                    belt.style.display = 'none';
                     return;
                 }
 
                 if (state.itemQueue.length < CONFIG.BELT_SIZE) {
                     fillItemQueue(getLevelConfig(state.currentLevel));
                 }
+
+                if (state.itemQueue.length === 0 && available.length > 0) {
+                    const rand = available[Math.floor(Math.random() * available.length)];
+                    state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false, isBomb: false, isIce: false,
+                        isGrape: false });
+                }
+
+                belt.style.display = 'flex';
 
                 const displayItems = state.itemQueue.slice(0, CONFIG.BELT_SIZE);
 
@@ -1687,38 +1863,52 @@
                     el.className = 'item';
                     if (item.isJunk) el.classList.add('junk');
                     if (item.isGolden) el.classList.add('golden');
+                    if (item.isBomb) el.classList.add('bomb');
+                    if (item.isIce) el.classList.add('ice');
+                    if (item.isGrape) el.classList.add('grape');
                     el.textContent = item.emoji;
                     el._isJunk = item.isJunk || false;
                     el._isGolden = item.isGolden || false;
+                    el._isBomb = item.isBomb || false;
+                    el._isIce = item.isIce || false;
+                    el._isGrape = item.isGrape || false;
 
                     el.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
-                        startDrag(el, item.emoji, e.clientX, e.clientY, item.isJunk, item.isGolden);
+                        startDrag(el, item.emoji, e.clientX, e.clientY, item.isJunk, item.isGolden, item.isBomb,
+                            item.isIce, item.isGrape);
                     });
                     belt.appendChild(el);
                 });
             }
 
             // ---------- DRAG ----------
-            function startDrag(item, emoji, x, y, isJunk = false, isGolden = false) {
+            function startDrag(item, emoji, x, y, isJunk = false, isGolden = false, isBomb = false, isIce = false,
+            isGrape = false) {
                 if (!state.gameActive || state.gameWon || state.isPaused) return;
                 drag.active = true;
                 drag.item = item;
                 drag.emoji = emoji;
                 drag.isJunk = isJunk;
                 drag.isGolden = isGolden;
+                drag.isBomb = isBomb;
+                drag.isIce = isIce;
+                drag.isGrape = isGrape;
 
                 drag.ghost = document.createElement('div');
                 drag.ghost.className = 'drag-ghost';
                 if (isJunk) drag.ghost.classList.add('junk');
                 if (isGolden) drag.ghost.classList.add('golden');
+                if (isBomb) drag.ghost.classList.add('bomb');
+                if (isIce) drag.ghost.classList.add('ice');
+                if (isGrape) drag.ghost.classList.add('grape');
                 drag.ghost.textContent = emoji;
                 document.body.appendChild(drag.ghost);
                 drag.ghost.style.left = x + 'px';
                 drag.ghost.style.top = y + 'px';
                 item.style.opacity = '0.3';
 
-                if (!isJunk) {
+                if (!isJunk && !isBomb && !isIce && !isGrape) {
                     state.trays.forEach(tray => {
                         if (tray.emoji === emoji && tray.current < tray.max && !tray.poisoned)
                             tray.el.classList.add('highlight');
@@ -1726,7 +1916,7 @@
                 }
 
                 const trashBin = document.getElementById('trashBin');
-                if (isJunk) {
+                if (isJunk || isIce) {
                     trashBin.classList.add('active');
                 } else {
                     trashBin.classList.remove('active');
@@ -1756,7 +1946,83 @@
                 const isOnTrash = x >= trashRect.left && x <= trashRect.right &&
                     y >= trashRect.top && y <= trashRect.bottom;
 
-                // === JUNK DROPPED ON TRASH ============================================
+                // === BOMB HANDLING ============================================
+                if (drag.isBomb) {
+                    // Drop anywhere -> explosion -> game over
+                    showFloatingText(x, y - 30, '💥 BOOM!', '#FF0000');
+                    burstParticles(x, y, 40, 0);
+                    playBombSound();
+                    if (navigator.vibrate) navigator.vibrate([100, 200, 100]);
+
+                    // Show bomb overlay briefly
+                    bombOverlay.classList.add('active');
+                    setTimeout(() => {
+                        bombOverlay.classList.remove('active');
+                    }, 1500);
+
+                    if (drag.item && drag.item.parentNode) drag.item.remove();
+                    const idx = state.itemQueue.findIndex(i => i.isBomb);
+                    if (idx !== -1) state.itemQueue.splice(idx, 1);
+                    updateItemBelt();
+                    cleanupDrag();
+
+                    // End game as loss
+                    endGame('loss');
+                    return;
+                }
+
+                // === ICE HANDLING ============================================
+                if (drag.isIce) {
+                    if (isOnTrash) {
+                        // Activate freeze
+                        showFloatingText(x, y - 30, '🧊 FREEZE!', '#4A90D9');
+                        burstParticles(x, y, 20, 200);
+                        playFreezeSound();
+                        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+                        if (drag.item && drag.item.parentNode) drag.item.remove();
+                        const idx = state.itemQueue.findIndex(i => i.isIce);
+                        if (idx !== -1) state.itemQueue.splice(idx, 1);
+                        updateItemBelt();
+                        cleanupDrag();
+                        activateFreeze();
+                        return;
+                    } else {
+                        // Ice dropped on shelf – freeze that shelf for 5 seconds (stop spoilage)
+                        const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
+                        'shelf'));
+                        if (targetEl) {
+                            const tray = state.trays.find(t => t.el === targetEl);
+                            if (tray) {
+                                // Freeze this single tray
+                                showFloatingText(x, y - 30, '🧊 SHELF FROZEN!', '#4A90D9');
+                                burstParticles(x, y, 15, 200);
+                                playFreezeSound();
+                                // Mark tray as frozen (no spoilage for 5s)
+                                tray.isFrozen = true;
+                                if (tray.freezeTimeout) clearTimeout(tray.freezeTimeout);
+                                tray.freezeTimeout = setTimeout(() => {
+                                    tray.isFrozen = false;
+                                    tray.freezeTimeout = null;
+                                    showFloatingText(x, y - 30, '❄️ Thawed!', '#4A90D9');
+                                }, 5000);
+                                // Remove ice from queue
+                                if (drag.item && drag.item.parentNode) drag.item.remove();
+                                const idx2 = state.itemQueue.findIndex(i => i.isIce);
+                                if (idx2 !== -1) state.itemQueue.splice(idx2, 1);
+                                updateItemBelt();
+                                cleanupDrag();
+                                return;
+                            }
+                        }
+                        // If dropped elsewhere, treat as miss (but not game over)
+                        // fall through to regular miss handling
+                    }
+                }
+
+                // === JUNK / FOOD / GRAPE handling ============================
+
+                // JUNK DROPPED ON TRASH
                 if (drag.isJunk && isOnTrash) {
                     state.junkCount++;
                     state.totalJunkDiscarded++;
@@ -1766,7 +2032,6 @@
                     playClickSound();
                     playCoinSound();
 
-                    // ✅ +5 seconds bonus (capped at initial time)
                     state.timeLeft = Math.min(state.timeLeft + CONFIG.JUNK_BONUS_SECONDS, state.levelStartTime);
                     document.getElementById('gameTime').textContent = state.timeLeft;
 
@@ -1779,9 +2044,10 @@
                     return;
                 }
 
-                // === JUNK DROPPED ON SHELF ============================================
+                // JUNK DROPPED ON SHELF (poison)
                 if (drag.isJunk) {
-                    const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
+                    const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
+                    'shelf'));
                     if (targetEl) {
                         const tray = state.trays.find(t => t.el === targetEl);
                         if (tray && !tray.poisoned && tray.current < tray.max) {
@@ -1801,7 +2067,8 @@
                             if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
 
                             if (drag.item && drag.item.parentNode) drag.item.remove();
-                            const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk);
+                            const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag
+                            .isJunk);
                             if (idx !== -1) state.itemQueue.splice(idx, 1);
                             updateItemBelt();
                             updateProgressBar();
@@ -1813,12 +2080,12 @@
                     }
                 }
 
-                // === FOOD DROPPED ON SHELF ============================================
+                // FOOD OR GRAPE DROPPED ON SHELF
                 const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
-                if (targetEl && !drag.isJunk) {
+                if (targetEl && !drag.isJunk && !drag.isBomb && !drag.isIce) {
                     const tray = state.trays.find(t => t.el === targetEl);
-                    // Check if the drop is valid (correct emoji, not full, not poisoned)
-                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state.gameWon && !state.isPaused) {
+                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state.gameWon &&
+                        !state.isPaused) {
                         // SUCCESS
                         tray.current++;
                         tray.badge.textContent = `${tray.current}/${tray.max}`;
@@ -1843,17 +2110,23 @@
                             showFloatingText(x, y - 60, '✨ GOLDEN! x2', '#FFD700');
                             burstParticles(x, y, 20, 45);
                         }
+                        if (drag.isGrape) {
+                            points *= 3; // Grape gives 3x
+                            showFloatingText(x, y - 60, '🍇 GRAPE! x3', '#6A1B9A');
+                            burstParticles(x, y, 25, 280);
+                        }
                         state.currentScore += points;
                         document.getElementById('gameScore').textContent = state.currentScore;
                         document.getElementById('comboDisplay').textContent = `x${multiplier}`;
 
-                        const color = multiplier >= 4 ? '#ffd700' : (multiplier >= 2 ? '#ffe66d' : '#8BA888');
+                        const color = drag.isGrape ? '#6A1B9A' : (multiplier >= 4 ? '#ffd700' : (multiplier >= 2 ?
+                            '#ffe66d' : '#8BA888'));
                         showFloatingText(x, y - 30, `+${points} x${multiplier}`, color);
                         burstParticles(x, y, 14, 30);
 
                         if (drag.item && drag.item.parentNode) drag.item.remove();
                         const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
-                            i.isGolden === drag.isGolden);
+                            i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
                         if (idx !== -1) state.itemQueue.splice(idx, 1);
                         updateItemBelt();
                         updateProgressBar();
@@ -1872,7 +2145,7 @@
                         document.getElementById('gameScore').textContent = state.currentScore;
                         shakeFridge();
 
-                        // ✅ Remove 2 items from the shelf if possible
+                        // Remove 2 items from shelf if possible
                         if (tray && !tray.poisoned && tray.current > 0) {
                             const removeCount = Math.min(2, tray.current);
                             tray.current -= removeCount;
@@ -1893,15 +2166,14 @@
                         playWrongSound();
                         if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
-                        // Remove the dragged item from queue
                         if (drag.item && drag.item.parentNode) drag.item.remove();
                         const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
-                            i.isGolden === drag.isGolden);
+                            i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
                         if (idx !== -1) state.itemQueue.splice(idx, 1);
                         updateItemBelt();
                         updateProgressBar();
                     }
-                } else if (!drag.isJunk) {
+                } else if (!drag.isJunk && !drag.isBomb && !drag.isIce) {
                     // Dropped outside any shelf – treat as miss
                     state.combo = 0;
                     state.mistakes++;
@@ -1913,16 +2185,63 @@
                     playWrongSound();
                     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
-                    // Remove item from queue
                     if (drag.item && drag.item.parentNode) drag.item.remove();
                     const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
-                        i.isGolden === drag.isGolden);
+                        i.isGolden === drag.isGolden && i.isGrape === drag.isGrape);
                     if (idx !== -1) state.itemQueue.splice(idx, 1);
                     updateItemBelt();
                 }
 
                 cleanupDrag();
                 document.getElementById('trashBin').classList.remove('active');
+            }
+
+            function activateFreeze() {
+                if (state.isFrozen) return; // already frozen
+                state.isFrozen = true;
+                state.freezeRemaining = 5;
+                freezeOverlay.classList.add('active');
+                freezeTimerLabel.textContent = `⏳ ${state.freezeRemaining}s`;
+
+                // Pause timer and spoilage
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+
+                // Countdown
+                if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                state.freezeTimerInterval = setInterval(() => {
+                    state.freezeRemaining--;
+                    freezeTimerLabel.textContent = `⏳ ${state.freezeRemaining}s`;
+                    if (state.freezeRemaining <= 0) {
+                        // End freeze
+                        clearInterval(state.freezeTimerInterval);
+                        state.freezeTimerInterval = null;
+                        freezeOverlay.classList.remove('active');
+                        state.isFrozen = false;
+                        // Resume timers
+                        startTimer();
+                        if (getLevelConfig(state.currentLevel).spoilageEnabled) {
+                            startSpoilageTimer();
+                        }
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, '❄️ Thawed!', '#4A90D9');
+                    }
+                }, 1000);
+
+                // Also auto-end after 5s via timeout
+                if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                state.freezeTimeout = setTimeout(() => {
+                    if (state.isFrozen) {
+                        clearInterval(state.freezeTimerInterval);
+                        state.freezeTimerInterval = null;
+                        freezeOverlay.classList.remove('active');
+                        state.isFrozen = false;
+                        startTimer();
+                        if (getLevelConfig(state.currentLevel).spoilageEnabled) {
+                            startSpoilageTimer();
+                        }
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, '❄️ Thawed!', '#4A90D9');
+                    }
+                }, 5000);
             }
 
             function cleanupDrag() {
@@ -1935,6 +2254,9 @@
                 drag.ghost = null;
                 drag.isJunk = false;
                 drag.isGolden = false;
+                drag.isBomb = false;
+                drag.isIce = false;
+                drag.isGrape = false;
             }
 
             function updateProgressBar() {
@@ -1948,9 +2270,11 @@
             function startSpoilageTimer() {
                 if (state.spoilageInterval) clearInterval(state.spoilageInterval);
                 state.spoilageInterval = setInterval(() => {
-                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+                    if (!state.gameActive || state.gameWon || state.isPaused || state.isFrozen) return;
 
                     state.trays.forEach(tray => {
+                        // Skip if frozen individually
+                        if (tray.isFrozen) return;
                         if (tray.current >= tray.max || tray.poisoned) return;
 
                         tray.spoilageTimer -= 1;
@@ -2021,7 +2345,7 @@
             function startTimer() {
                 if (state.timerInterval) clearInterval(state.timerInterval);
                 state.timerInterval = setInterval(() => {
-                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+                    if (!state.gameActive || state.gameWon || state.isPaused || state.isFrozen) return;
                     state.timeLeft--;
                     document.getElementById('gameTime').textContent = state.timeLeft;
 
@@ -2069,6 +2393,11 @@
                 state.gameActive = false;
                 if (state.timerInterval) clearInterval(state.timerInterval);
                 if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                freezeOverlay.classList.remove('active');
+                bombOverlay.classList.remove('active');
+                state.isFrozen = false;
                 document.body.classList.remove('low-time');
 
                 const timeBonus = Math.floor(state.timeLeft / 10) * 2;
@@ -2077,7 +2406,6 @@
                 let coinsEarned = 0;
                 const isGatekeeper = isGatekeeperLevel(state.currentLevel);
 
-                // Show remaining time in modal
                 document.getElementById('remainingTimeDisplay').textContent = Math.max(0, state.timeLeft);
 
                 if (result === 'win') {
@@ -2160,8 +2488,9 @@
                     checkAchievements(state);
                 } else {
                     state.losses[state.currentCategory]++;
-                    document.getElementById('resultTitle').textContent = '😅 OUT OF TIME, CHEF!';
-                    document.getElementById('resultMessage').textContent = `Don't let the groceries spoil! Retry!\n⏳ Time left: 0s`;
+                    document.getElementById('resultTitle').textContent = '💥 GAME OVER!';
+                    document.getElementById('resultMessage').textContent =
+                        `Boom! You triggered a bomb or ran out of time.\n⏳ Time left: 0s`;
                     document.getElementById('coinsEarned').textContent = '0';
                     document.getElementById('gatekeeperMessage').style.display = 'none';
                     playWrongSound();
@@ -2327,6 +2656,11 @@
                     playClickSound();
                     if (state.timerInterval) clearInterval(state.timerInterval);
                     if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                    if (state.freezeTimeout) clearTimeout(state.freezeTimeout);
+                    if (state.freezeTimerInterval) clearInterval(state.freezeTimerInterval);
+                    freezeOverlay.classList.remove('active');
+                    bombOverlay.classList.remove('active');
+                    state.isFrozen = false;
                     state.gameActive = false;
                     document.body.classList.remove('low-time');
                     showLevelPage(state.currentCategory);
