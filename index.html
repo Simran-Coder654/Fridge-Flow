@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FridgeFlow - Pro</title>
+    <!-- ✅ FIXED CSP – allows Google Fonts -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   style-src 'unsafe-inline' https://fonts.googleapis.com; 
+                   font-src https://fonts.gstatic.com; 
+                   script-src 'unsafe-inline'">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* -------------------- ALL STYLES -------------------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at 20% 20%, #F5EDE6, #E4D5C8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2D1A12;
+            padding: 1rem;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body.low-time {
+            box-shadow: inset 0 0 80px rgba(191, 87, 34, 0.15);
+            transition: 0.5s;
+        }
+        #particles-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(164, 120, 100, 0.08);
+            animation: floatParticle 20s infinite alternate ease-in-out;
+        }
+        @keyframes floatParticle {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+            100% { transform: translate(80px, -60px) scale(1.5); opacity: 0.6; }
+        }
+
+        .page {
+            max-width: 720px;
+            width: 100%;
+            background: rgba(255, 248, 240, 0.92);
+            backdrop-filter: blur(16px);
+            border-radius: 2.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 30px 40px -15px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+            max-height: 98vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .hidden { display: none !important; }
+
+        .btn {
+            background: linear-gradient(145deg, #A47864, #8B645A);
+            border: none;
+            font-size: 1.6rem;
+            font-weight: 800;
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            color: #FDF6E3;
+            cursor: pointer;
+            border-bottom: 5px solid #56453F;
+            box-shadow: 0 8px 0 #3D2E28;
+            transition: transform 0.08s, box-shadow 0.08s, filter 0.2s;
+            letter-spacing: -0.5px;
+        }
+        .btn:active { transform: translateY(5px); box-shadow: 0 3px 0 #3D2E28; }
+        .btn:hover { filter: brightness(1.08); }
+
+        .btn-small {
+            background: #E4D5C8;
+            border: 1px solid #A47864;
+            color: #2D1A12;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            border-bottom: 3px solid #BBAA92;
+            transition: 0.1s;
+        }
+        .btn-small:active { transform: translateY(2px); }
+        .btn-small:hover { background: #F5EDE6; }
+
+        .btn-icon {
+            background: rgba(164, 120, 100, 0.08);
+            border: 1px solid rgba(164, 120, 100, 0.15);
+            color: #2D1A12;
+            font-size: 1.2rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-icon:hover { background: rgba(164, 120, 100, 0.2); }
+
+        .welcome-header h1 {
+            font-size: clamp(2.8rem, 12vw, 4.2rem);
+            color: #8B645A;
+            text-shadow: 0 4px 0 #E4D5C8;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        .welcome-header p {
+            opacity: 0.7;
+            text-align: center;
+            margin-top: -0.3rem;
+            font-weight: 400;
+            color: #2D1A12;
+        }
+
+        .cat-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            margin: 1rem 0;
+        }
+        .cat-btn {
+            background: linear-gradient(145deg, #F5EDE6, #E4D5C8);
+            border: 1px solid #BBAA92;
+            border-radius: 60px;
+            padding: 0.7rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.4rem;
+            color: #2D1A12;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #BBAA92;
+            transition: 0.15s;
+        }
+        .cat-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #BBAA92; }
+        .cat-btn .emoji-group { font-size: 1.8rem; min-width: 60px; }
+        .cat-btn .cat-name { font-weight: 700; flex:1; }
+        .cat-btn .cat-stats { font-size: 0.85rem; opacity: 0.8; display: flex; gap: 0.8rem; align-items: center; }
+        .cat-btn .cat-stats span { background: #FDF6E3; padding: 0.15rem 0.8rem; border-radius: 30px; }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.5rem;
+        }
+        .level-card {
+            aspect-ratio: 1/1;
+            background: linear-gradient(145deg, #F5EDE6, #E4D5C8);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #BBAA92;
+            position: relative;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+        .level-card:hover { transform: scale(1.05); border-color: #A47864; }
+        .level-card.completed[data-stars="3"] {
+            background: linear-gradient(145deg, #D4E8D0, #8BA888);
+            border-color: #8BA888;
+            box-shadow: 0 0 30px rgba(139, 168, 136, 0.25);
+        }
+        .level-card.completed[data-stars="2"] {
+            background: linear-gradient(145deg, #E8E0D0, #A8A088);
+            border-color: #A8A088;
+        }
+        .level-card.completed[data-stars="1"] {
+            background: linear-gradient(145deg, #E8D8D0, #A88880);
+            border-color: #A88880;
+        }
+        .level-card.active {
+            background: #D4C8E0;
+            border-color: #A47864;
+            box-shadow: 0 0 20px rgba(164,120,100,0.3);
+        }
+        .level-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.6);
+            cursor: default;
+        }
+        .level-card.locked:hover { transform: none !important; border-color: #4a5a62 !important; }
+        .level-card.gatekeeper { border-color: #E8A14A; border-width: 3px; }
+        .level-card.gatekeeper::after {
+            content: '⭐';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 0.7rem;
+        }
+        .level-number { font-weight: 700; font-size: 1rem; color: #2D1A12; }
+        .level-stars { font-size: 0.6rem; letter-spacing: 2px; margin-top: 2px; }
+        .level-coins-badge {
+            position: absolute; bottom: 3px; right: 5px;
+            font-size: 0.55rem; background: rgba(0,0,0,0.05); padding: 0.05rem 0.4rem;
+            border-radius: 10px; color: #8B645A;
+        }
+
+        .unlock-btn {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #E8A14A;
+            border-radius: 20px;
+            color: #FDF6E3;
+            font-size: 0.5rem;
+            padding: 0.15rem 0;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .unlock-btn:hover { background: rgba(232, 161, 74, 0.3); border-color: #F2C94C; }
+
+        .fridge-container {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+        .fridge {
+            width: 280px;
+            height: 380px;
+            position: relative;
+            perspective: 2000px;
+        }
+        .fridge-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #F5EDE6, #D4C8C0);
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.2), inset 0 -4px 8px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 12px;
+            overflow: hidden;
+        }
+        .fridge-body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, #FFFDF8, transparent 80%);
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .fridge-door {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(150deg, #FFFDF8, #E4D5C8);
+            border-radius: 24px;
+            transform-origin: right center;
+            transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+            box-shadow: -6px 6px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            border: 2px solid #D4C8C0;
+            overflow: hidden;
+        }
+        .fridge-door::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 35%;
+            height: 25%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50%;
+            filter: blur(8px);
+            pointer-events: none;
+        }
+        .fridge-door.open { transform: rotateY(150deg); }
+        .handle {
+            position: absolute;
+            left: 10px;
+            top: 40%;
+            width: 8px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #F5EDE6, #BBAA92);
+            border-radius: 10px;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.5);
+        }
+        .door-label {
+            background: #A47864;
+            color: #FDF6E3;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .temp-display {
+            position: absolute;
+            bottom: 10px;
+            right: 14px;
+            background: #FDF6E3;
+            color: #8B645A;
+            padding: 0.1rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            border: 1px solid #BBAA92;
+            letter-spacing: 0.5px;
+            z-index: 5;
+        }
+
+        .shelf-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            height: 72px;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .shelf {
+            width: 48%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 4px 6px -4px rgba(0,0,0,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .shelf .shelf-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        .shelf .shelf-content .tray-compartment {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255,255,255,0.3);
+            padding: 2px 6px;
+            border-radius: 14px;
+            width: 92%;
+            height: 40px;
+        }
+        .shelf .spoilage-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #8BA888;
+            width: 100%;
+            transition: width 0.5s, background 0.5s;
+            border-radius: 0 0 14px 14px;
+        }
+        .shelf .spoilage-bar.warning { background: #E8A14A; }
+        .shelf .spoilage-bar.danger { background: #BF5722; animation: pulseBar 0.5s infinite; }
+        @keyframes pulseBar { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .shelf.spoiling { border-color: #BF5722 !important; box-shadow: 0 0 20px rgba(191,87,34,0.3) !important; }
+        .shelf.poisoned { background: rgba(191,87,34,0.15) !important; border-color: #BF5722 !important; }
+        .shelf.full { 
+            background: rgba(139, 168, 136, 0.3) !important;
+            border-color: #8BA888 !important;
+            animation: fullFlash 0.5s ease;
+        }
+        .shelf.highlight {
+            border-color: #E8A14A !important;
+            box-shadow: 0 0 15px rgba(232,161,74,0.5) !important;
+        }
+        @keyframes fullFlash {
+            0% { box-shadow: 0 0 0 rgba(139, 168, 136, 0); }
+            50% { box-shadow: 0 0 40px rgba(139, 168, 136, 0.4); }
+            100% { box-shadow: 0 0 0 rgba(139, 168, 136, 0); }
+        }
+
+        .tray-cell {
+            width: 1.8rem;
+            height: 1.8rem;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .tray-badge {
+            background: #FDF6E3;
+            color: #8B645A;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.05rem 0.3rem;
+            border-radius: 10px;
+            min-width: 1.8rem;
+            text-align: center;
+        }
+        .hidden-tray {
+            opacity: 0.8;
+            background: #D4E8D0 !important;
+            border: 2px solid #8BA888 !important;
+            box-shadow: inset 0 0 20px rgba(139,168,136,0.15);
+        }
+        .hidden-tray .tray-badge { background: #8BA888; color: #FDF6E3; }
+
+        .trash-bin {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.05);
+            border: 2px dashed #BBAA92;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 15;
+            backdrop-filter: blur(4px);
+        }
+        .trash-bin:hover { transform: translateX(-50%) scale(1.1); background: rgba(191,87,34,0.08); border-color: #BF5722; }
+        .trash-bin.active { border-color: #BF5722; background: rgba(191,87,34,0.12); }
+
+        .item-belt {
+            background: rgba(0,0,0,0.03);
+            border-radius: 40px;
+            padding: 0.5rem;
+            margin: 0.4rem 0;
+            border: 1px dashed rgba(164, 120, 100, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 3.5rem;
+            backdrop-filter: blur(4px);
+            position: relative;
+            transition: all 0.3s;
+        }
+        .item {
+            font-size: 1.6rem;
+            width: 2.6rem;
+            height: 2.6rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, #FFFDF8, #D4C8C0);
+            border-radius: 30% 70% 50% 50%;
+            box-shadow: 0 4px 0 #BBAA92, 0 6px 12px rgba(0,0,0,0.08);
+            cursor: grab;
+            touch-action: none;
+            transition: 0.1s;
+            position: relative;
+            opacity: 0;
+            animation: itemAppear 0.3s ease-out forwards;
+        }
+        .item:nth-child(1) { animation-delay: 0.03s; }
+        .item:nth-child(2) { animation-delay: 0.06s; }
+        .item:nth-child(3) { animation-delay: 0.09s; }
+        .item:nth-child(4) { animation-delay: 0.12s; }
+        .item:nth-child(5) { animation-delay: 0.15s; }
+        .item:nth-child(6) { animation-delay: 0.18s; }
+        .item:nth-child(7) { animation-delay: 0.21s; }
+        .item:nth-child(8) { animation-delay: 0.24s; }
+        @keyframes itemAppear {
+            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .item.junk {
+            background: radial-gradient(circle at 30% 30%, #FFE8E0, #E4B8A8) !important;
+            box-shadow: 0 4px 0 #BF5722, 0 6px 12px rgba(0,0,0,0.08) !important;
+        }
+        .item.junk::after {
+            content: '⚠️';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.5rem;
+        }
+        .item.golden {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520) !important;
+            box-shadow: 0 4px 0 #B8860B, 0 0 20px rgba(255, 215, 0, 0.3) !important;
+            animation: goldenPulse 1s infinite alternate;
+        }
+        @keyframes goldenPulse {
+            0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+            100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+        }
+        .item:active { cursor: grabbing; }
+
+        .drag-ghost {
+            position: fixed;
+            font-size: 2rem;
+            width: 2.6rem;
+            height: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, #FFFDF8, #D4C8C0);
+            border-radius: 30% 70% 50% 50%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            border: 3px solid #8BA888;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.9;
+            will-change: transform;
+            transform: translate(-50%, -50%) !important;
+        }
+        .drag-ghost.junk {
+            border-color: #BF5722;
+            background: radial-gradient(circle at 30% 30%, #FFE8E0, #E4B8A8);
+        }
+        .drag-ghost.golden {
+            border-color: #FFD700;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.03);
+            border-radius: 40px;
+            padding: 0.3rem 0.8rem;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+        .game-stats { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .stat-pill {
+            background: #FDF6E3;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: #2D1A12;
+        }
+        .level-badge {
+            background: #FDF6E3;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+            color: #2D1A12;
+            flex-wrap: wrap;
+        }
+        .level-badge span { color: #8B645A; font-weight: 700; }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #E4D5C8;
+            border-radius: 3px;
+            margin: 0.2rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8BA888, #A47864);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        #gameInstructions {
+            background: rgba(164, 120, 100, 0.08);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(164, 120, 100, 0.15);
+            color: #2D1A12;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            margin: 0.3rem 0;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.85rem;
+            animation: pulseGlow 1.8s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0.6; transform: scale(1); box-shadow: 0 0 0 rgba(164,120,100,0); }
+            50% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 30px rgba(164,120,100,0.08); }
+            100% { opacity: 0.6; transform: scale(1); box-shadow: 0 0 0 rgba(164,120,100,0); }
+        }
+
+        .floating-score {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            z-index: 9999;
+            animation: floatUp 0.9s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-90px) scale(1.3); }
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 9998;
+            animation: particleFly 0.8s ease-out forwards;
+        }
+        @keyframes particleFly {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+        }
+
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9997;
+            animation: confettiFall var(--dur) ease-out forwards;
+        }
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 248, 240, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .modal-overlay.show { visibility: visible; opacity: 1; }
+        .modal-card {
+            background: #FDF6E3;
+            padding: 1.8rem;
+            border-radius: 45px;
+            border: 2px solid #A47864;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 30px 50px -20px rgba(0,0,0,0.1);
+        }
+        .modal-card h1 { font-size: 2.2rem; margin-bottom: 0.3rem; color: #8B645A; }
+        .modal-card .sub { opacity: 0.8; color: #2D1A12; }
+        .star-display { font-size: 2.5rem; letter-spacing: 10px; margin: 0.5rem 0; }
+        .coins-earned-display { font-size: 1.2rem; font-weight: 700; color: #8B645A; margin: 0.5rem 0; }
+        .gatekeeper-message { color: #BF5722; font-weight: 700; margin: 0.5rem 0; }
+
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2D1A12;
+            color: #FDF6E3;
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            border: 2px solid #E8A14A;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 9999;
+            animation: achievementSlide 3s ease forwards;
+            max-width: 300px;
+        }
+        @keyframes achievementSlide {
+            0% { transform: translateX(120%); opacity: 0; }
+            15% { transform: translateX(0); opacity: 1; }
+            85% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
+        .achievement-popup .title { font-weight: 700; font-size: 1rem; color: #E8A14A; }
+        .achievement-popup .desc { font-size: 0.85rem; opacity: 0.8; }
+
+        .pause-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 248, 240, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            flex-direction: column;
+            gap: 1.2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2D1A12;
+        }
+        .pause-overlay.hidden { display: none; }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #E4D5C8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #A47864; border-radius: 10px; }
+
+        @media (max-width: 650px) {
+            .level-grid { grid-template-columns: repeat(8, 1fr); }
+            .fridge { width: 240px; height: 330px; }
+            .shelf-row { height: 62px; }
+        }
+        @media (max-width: 500px) {
+            .level-grid { grid-template-columns: repeat(6, 1fr); }
+            .fridge { width: 200px; height: 280px; }
+            .shelf-row { height: 50px; }
+            .tray-cell { width: 1.6rem; height: 1.6rem; font-size: 1rem; }
+            .tray-badge { font-size: 0.5rem; min-width: 1.6rem; }
+            .trash-bin { width: 32px; height: 32px; font-size: 1rem; bottom: 35px; }
+            .item { width: 3rem; height: 3rem; font-size: 1.8rem; }
+            .stat-pill { font-size: 0.7rem; padding: 0.1rem 0.5rem; }
+        }
+        @media (max-width: 400px) {
+            .level-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .settings-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(164, 120, 100, 0.05);
+            border: 1px solid rgba(164, 120, 100, 0.1);
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #8B645A;
+            transition: 0.2s;
+        }
+        .settings-icon:hover { background: rgba(164, 120, 100, 0.15); color: #2D1A12; }
+        .settings-panel {
+            background: #FDF6E3;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid #E4D5C8;
+        }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; }
+        .settings-row label { font-size: 0.9rem; opacity: 0.8; color: #2D1A12; }
+        .settings-row button { background: #E4D5C8; border: none; color: #2D1A12; padding: 0.2rem 0.8rem; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .settings-row button:hover { background: #D4C8C0; }
+
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .shake { animation: shake 0.25s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+        .coin-display {
+            background: linear-gradient(145deg, #FDF6E3, #F5EDE6);
+            color: #2D1A12;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 2px solid #BBAA92;
+            box-shadow: 0 4px 0 #BBAA92;
+            margin-bottom: 1rem;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .stat-card {
+            background: #FDF6E3;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            color: #2D1A12;
+        }
+        .category-badge {
+            background: #FDF6E3;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            border: 1px solid #BBAA92;
+            color: #2D1A12;
+        }
+        .pause-btn {
+            background: #FDF6E3;
+            border: 1px solid #BBAA92;
+            border-radius: 30px;
+            padding: 0.1rem 0.7rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #2D1A12;
+        }
+        .pause-btn:hover { background: #E4D5C8; }
+
+        .item-belt.speed-burst .item {
+            animation: speedPulse 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes speedPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        @keyframes victoryPulse {
+            0% { opacity:0; transform:scale(0.8); }
+            50% { opacity:1; transform:scale(1.2); }
+            100% { opacity:0; transform:scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-bg"></div>
+
+    <!-- WELCOME -->
+    <div id="welcomePage" class="page">
+        <div class="welcome-header">
+            <h1>🧊 FRIDGE<br>FLOW</h1>
+            <p style="letter-spacing:2px;font-weight:300;">PRO • STOCK • SURVIVE</p>
+        </div>
+        <div class="flex-center" style="min-height:200px;">
+            <button class="btn" id="startBtn">▶ START GAME</button>
+        </div>
+        <div style="text-align:center;font-size:0.8rem;opacity:0.4;margin-top:1rem;color:#2D1A12;">
+            🧊 Spoilage • 🗑️ Junk • ⚡ Speed Burst • ⭐ 3-Star Gates
+        </div>
+    </div>
+
+    <!-- CATEGORY -->
+    <div id="categoryPage" class="page hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+            <h2 style="font-weight:700; font-size:1.5rem; color:#2D1A12;">📂 CATEGORIES</h2>
+            <button class="btn-icon" id="settingsToggle" style="font-size:1.2rem;">⚙️</button>
+        </div>
+        <div id="settingsPanel" class="settings-panel hidden">
+            <div class="settings-row"><label>🔊 Sound</label><button id="soundToggleSettings">ON</button></div>
+            <div class="settings-row"><label>🔄 Reset Progress</label><button id="resetProgressBtn">Reset</button></div>
+        </div>
+        <div class="coin-display">🪙 COINS: <span id="totalCoins">0</span></div>
+        <div class="stats-row" style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;">
+            <div class="stat-card">🏆 <span id="winTotal">0</span></div>
+            <div class="stat-card">💔 <span id="lossTotal">0</span></div>
+            <div class="stat-card">🏅 <span id="achievementCount">0</span></div>
+        </div>
+        <div class="cat-grid">
+            <div class="cat-btn" id="selectFruit"><span class="emoji-group">🍎🍌🍓</span><span class="cat-name">FRUITS</span><div class="cat-stats"><span id="fruitLevel">Lvl 1/70</span><span id="fruitWL">0/0</span></div></div>
+            <div class="cat-btn" id="selectVeg"><span class="emoji-group">🥕🥦🌽</span><span class="cat-name">VEGGIES</span><div class="cat-stats"><span id="vegLevel">Lvl 1/70</span><span id="vegWL">0/0</span></div></div>
+            <div class="cat-btn" id="selectDrink"><span class="emoji-group">🥤🧃🍹</span><span class="cat-name">DRINKS</span><div class="cat-stats"><span id="drinkLevel">Lvl 1/70</span><span id="drinkWL">0/0</span></div></div>
+            <div class="cat-btn" id="selectFastfood"><span class="emoji-group">🍔🍟🍕</span><span class="cat-name">FASTFOOD</span><div class="cat-stats"><span id="fastfoodLevel">Lvl 1/70</span><span id="fastfoodWL">0/0</span></div></div>
+            <div class="cat-btn" id="selectSweets"><span class="emoji-group">🍦🍩🍪</span><span class="cat-name">SWEETS</span><div class="cat-stats"><span id="sweetsLevel">Lvl 1/70</span><span id="sweetsWL">0/0</span></div></div>
+        </div>
+        <button class="btn-small" id="backFromCat">← BACK</button>
+    </div>
+
+    <!-- LEVELS -->
+    <div id="levelPage" class="page hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+            <div style="display:flex; align-items:center; gap:0.8rem;">
+                <button class="btn-small" id="backToCategory">←</button>
+                <span class="category-badge" id="selectedCategoryTitle">🍎 FRUITS</span>
+            </div>
+            <div style="display:flex;gap:0.8rem;font-size:0.85rem; color:#2D1A12;">
+                <span>🔓 <span id="unlockedCount">1</span>/70</span>
+                <span>✅ <span id="completedCount">0</span>/70</span>
+                <span>🪙 <span id="levelPageCoins">0</span></span>
+            </div>
+        </div>
+        <div class="level-grid-container" style="background:rgba(0,0,0,0.02);border-radius:20px;padding:1rem;">
+            <div class="level-grid" id="levelGrid"></div>
+        </div>
+    </div>
+
+    <!-- GAME -->
+    <div id="gamePage" class="page hidden" style="position:relative;">
+        <span class="settings-icon" id="gameSettingsToggle">⚙️</span>
+
+        <div class="game-header">
+            <button class="btn-small" id="backToLevels">← LEVELS</button>
+            <div class="game-stats">
+                <div class="stat-pill">⭐<span id="gameScore">0</span></div>
+                <div class="stat-pill">⏳<span id="gameTime">40</span>s</div>
+                <div class="stat-pill">🗑️<span id="junkCount">0</span></div>
+                <button class="pause-btn" id="pauseBtn">⏸️</button>
+            </div>
+        </div>
+        <div class="level-badge">
+            🎯 LEVEL <span id="currentLevel">1</span>/70
+            · 🪙 <span id="levelCoins">2</span> BASE
+            · 🔥 <span id="comboDisplay">x1</span>
+            <span id="gatekeeperBadge" style="display:none;color:#E8A14A;font-weight:700;">⭐ GATEKEEPER</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="gameProgress"></div></div>
+
+        <div id="gameInstructions">👆 Drag food to matching shelf · 🗑️ Drag junk to trash bin</div>
+
+        <div class="item-belt" id="gameItems"></div>
+
+        <div class="fridge-container">
+            <div class="fridge" id="fridgeContainer">
+                <div class="fridge-body" id="fridgeBody">
+                    <div class="temp-display">❄️ 4°C</div>
+                </div>
+                <div class="fridge-door" id="door">
+                    <div class="handle"></div>
+                    <span class="door-label">OPEN</span>
+                </div>
+                <div class="trash-bin" id="trashBin">🗑️</div>
+                <div class="pause-overlay hidden" id="pauseOverlay">
+                    <span>⏸️ PAUSED</span>
+                    <button class="btn-small" id="resumeBtn" style="font-size:1.2rem;padding:0.6rem 2rem;">▶️ RESUME</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <h1 id="resultTitle">🏆</h1>
+            <div id="resultMessage" class="sub"></div>
+            <div class="stats-row" style="display:flex;gap:0.8rem;justify-content:center;margin:0.5rem 0;">
+                <div class="stat-card">⭐ <span id="finalScore">0</span></div>
+                <div class="stat-card">⏱️ <span id="timeBonus">0</span></div>
+            </div>
+            <div class="star-display" id="starDisplay">☆☆☆</div>
+            <div class="coins-earned-display">🪙 Coins Earned: <span id="coinsEarned">0</span></div>
+            <div id="gatekeeperMessage" class="gatekeeper-message" style="display:none;">
+                ⭐ You need 3 stars to unlock the next block! Retry or unlock with coins!
+            </div>
+            <div class="continue-options" id="victoryButtons" style="display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- SECURITY ----------
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                }
+            });
+
+            // ---------- AUDIO ----------
+            let audioContext = null;
+            let soundEnabled = true;
+
+            function initAudio() {
+                if (audioContext) return;
+                try { audioContext = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundEnabled = false; }
+            }
+
+            function playBeep(freq, dur, vol = 0.25) {
+                if (!soundEnabled || !audioContext) return;
+                try {
+                    const now = audioContext.currentTime;
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(vol, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+                    osc.start(now);
+                    osc.stop(now + dur);
+                } catch (e) {}
+            }
+            function playCorrectSound() { playBeep(523, 0.1); setTimeout(() => playBeep(659, 0.15), 100); setTimeout(() => playBeep(784, 0.2), 200); }
+            function playWrongSound() { playBeep(440, 0.15); setTimeout(() => playBeep(349, 0.2), 120); setTimeout(() => playBeep(294, 0.25), 250); }
+            function playSpoilageSound() { playBeep(300, 0.3, 0.15); setTimeout(() => playBeep(250, 0.4, 0.15), 200); }
+            function playJunkSound() { playBeep(200, 0.2, 0.2); setTimeout(() => playBeep(150, 0.3, 0.2), 150); }
+            function playVictorySound() {
+                playBeep(523, 0.12);
+                setTimeout(() => playBeep(659, 0.12), 120);
+                setTimeout(() => playBeep(784, 0.15), 240);
+                setTimeout(() => playBeep(1047, 0.3), 400);
+                setTimeout(() => { playBeep(784, 0.2);
+                    setTimeout(() => playBeep(880, 0.25), 180); }, 550);
+            }
+            function playClickSound() { playBeep(880, 0.05, 0.1); }
+            function playSpeedBurstSound() { playBeep(1000, 0.05, 0.1);
+                setTimeout(() => playBeep(1200, 0.05, 0.1), 80);
+                setTimeout(() => playBeep(1400, 0.08, 0.1), 160); }
+            function playCoinSound() { playBeep(880, 0.05, 0.15);
+                setTimeout(() => playBeep(1100, 0.05, 0.15), 80);
+                setTimeout(() => playBeep(1320, 0.08, 0.15), 160); }
+            function playAchievementSound() { playBeep(523, 0.1);
+                setTimeout(() => playBeep(659, 0.1), 100);
+                setTimeout(() => playBeep(784, 0.15), 200); }
+
+            // ---------- CONFIG ----------
+            const CONFIG = {
+                POINTS_PER_ITEM: 10,
+                PENALTY_PER_MISTAKE: 5,
+                MAX_LEVEL: 70,
+                BASE_COINS: 2,
+                RETRY_COST: 1,
+                JUNK_ITEMS: ['🧹', '🗑️', '🧊', '💣', '🧽'],
+                GOLDEN_CHANCE: 0.08,
+                MAX_PARTICLES: 50
+            };
+
+            // ---------- ACHIEVEMENTS ----------
+            const ACHIEVEMENTS = {
+                first_win: { id: 'first_win', name: '🍎 First Stock', desc: 'Complete your first level', unlocked: false },
+                three_star: { id: 'three_star', name: '⭐ Star Collector', desc: 'Get 3 stars on any level',
+                unlocked: false },
+                level_10: { id: 'level_10', name: '📈 Level 10', desc: 'Reach level 10 in any category',
+                unlocked: false },
+                coins_100: { id: 'coins_100', name: '💰 Rich', desc: 'Collect 100 coins', unlocked: false },
+                coins_500: { id: 'coins_500', name: '💎 Wealthy', desc: 'Collect 500 coins', unlocked: false },
+                gatekeeper_pass: { id: 'gatekeeper_pass', name: '⭐ Gatecrasher', desc: 'Pass a gatekeeper level with 3 stars',
+                    unlocked: false },
+                combo_5: { id: 'combo_5', name: '🔥 Combo Master', desc: 'Reach a 5x combo', unlocked: false },
+                perfect_level: { id: 'perfect_level', name: '🎯 Perfect', desc: 'Complete a level with 3 stars and 0 mistakes',
+                    unlocked: false },
+                junk_discarder: { id: 'junk_discarder', name: '🗑️ Cleaner', desc: 'Discard 10 junk items',
+                unlocked: false },
+                level_50: { id: 'level_50', name: '🚀 Level 50', desc: 'Reach level 50 in any category',
+                unlocked: false }
+            };
+
+            let achievements = { ...ACHIEVEMENTS };
+
+            try {
+                const savedAch = localStorage.getItem('fridgeflow_achievements');
+                if (savedAch) {
+                    const parsed = JSON.parse(savedAch);
+                    Object.keys(parsed).forEach(key => {
+                        if (achievements[key]) achievements[key].unlocked = parsed[key].unlocked;
+                    });
+                }
+            } catch (e) {}
+
+            function saveAchievements() {
+                try {
+                    localStorage.setItem('fridgeflow_achievements', JSON.stringify(achievements));
+                } catch (e) {}
+            }
+
+            function unlockAchievement(id) {
+                if (achievements[id] && !achievements[id].unlocked) {
+                    achievements[id].unlocked = true;
+                    saveAchievements();
+                    showAchievementPopup(achievements[id]);
+                    playAchievementSound();
+                    const count = Object.values(achievements).filter(a => a.unlocked).length;
+                    document.getElementById('achievementCount').textContent = count;
+                    return true;
+                }
+                return false;
+            }
+
+            function showAchievementPopup(ach) {
+                const popup = document.createElement('div');
+                popup.className = 'achievement-popup';
+                popup.innerHTML = `
+                    <div class="title">🏅 ACHIEVEMENT UNLOCKED!</div>
+                    <div class="title" style="font-size:1.1rem;color:#FDF6E3;">${ach.name}</div>
+                    <div class="desc">${ach.desc}</div>
+                `;
+                document.body.appendChild(popup);
+                setTimeout(() => popup.remove(), 3500);
+            }
+
+            function checkAchievements(state) {
+                const totalWins = Object.values(state.wins).reduce((a, b) => a + b, 0);
+                const totalCoins = state.totalCoins;
+                const maxLevel = Math.max(...Object.values(state.levels));
+
+                if (totalWins >= 1) unlockAchievement('first_win');
+                if (state.earnedStars === 3) unlockAchievement('three_star');
+                if (maxLevel >= 10) unlockAchievement('level_10');
+                if (totalCoins >= 100) unlockAchievement('coins_100');
+                if (totalCoins >= 500) unlockAchievement('coins_500');
+                if (state.gatekeeperPassed) unlockAchievement('gatekeeper_pass');
+                if (state.combo >= 5) unlockAchievement('combo_5');
+                if (state.perfectLevel) unlockAchievement('perfect_level');
+                if (state.totalJunkDiscarded >= 10) unlockAchievement('junk_discarder');
+                if (maxLevel >= 50) unlockAchievement('level_50');
+
+                const count = Object.values(achievements).filter(a => a.unlocked).length;
+                document.getElementById('achievementCount').textContent = count;
+            }
+
+            // ---------- GATEKEEPER COSTS ----------
+            const GATEKEEPER_COSTS = {
+                6: 6, 11: 10, 16: 20, 21: 35, 26: 45, 31: 60, 36: 80,
+                41: 100, 46: 135, 51: 150, 56: 175, 61: 195, 66: 230
+            };
+
+            // ---------- LEVEL CONFIG ----------
+            function isGatekeeperLevel(level) {
+                return [6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56, 61, 66].includes(level);
+            }
+
+            function getGatekeeperCost(level) {
+                return GATEKEEPER_COSTS[level] || 70;
+            }
+
+            function getLevelConfig(level) {
+                if (level >= 1 && level <= 5) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 2, itemsPerContainer: 10, timeLimit: times[level - 1], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: false };
+                }
+                if (level >= 6 && level <= 10) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 4, itemsPerContainer: 10, timeLimit: times[level - 6], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 6 };
+                }
+                if (level >= 11 && level <= 15) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 2, itemsPerContainer: 20, timeLimit: times[level - 11], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 11 };
+                }
+                if (level >= 16 && level <= 20) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 4, itemsPerContainer: 20, timeLimit: times[level - 16], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 16 };
+                }
+                if (level >= 21 && level <= 25) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 3, itemsPerContainer: 15, timeLimit: times[level - 21], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 21 };
+                }
+                if (level >= 26 && level <= 30) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 5, itemsPerContainer: 15, timeLimit: times[level - 26], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 26 };
+                }
+                if (level >= 31 && level <= 35) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 3, itemsPerContainer: 20, timeLimit: times[level - 31], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 31 };
+                }
+                if (level >= 36 && level <= 40) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 5, itemsPerContainer: 20, timeLimit: times[level - 36], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 36 };
+                }
+                if (level >= 41 && level <= 45) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 4, itemsPerContainer: 20, timeLimit: times[level - 41], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 41 };
+                }
+                if (level >= 46 && level <= 50) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 6, itemsPerContainer: 20, timeLimit: times[level - 46], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 46 };
+                }
+                if (level >= 51 && level <= 55) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 3, itemsPerContainer: 25, timeLimit: times[level - 51], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 51 };
+                }
+                if (level >= 56 && level <= 60) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 5, itemsPerContainer: 25, timeLimit: times[level - 56], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 56 };
+                }
+                if (level >= 61 && level <= 65) {
+                    const times = [40, 35, 30, 25, 15];
+                    return { containers: 4, itemsPerContainer: 30, timeLimit: times[level - 61], spoilageEnabled: true,
+                        junkEnabled: true, gatekeeper: level === 61 };
+                }
+                if (level >= 66 && level <= 70) {
+                    const times = [70, 65, 60, 50, 40];
+                    return { containers: 6, itemsPerContainer: 30, timeLimit: times[level - 66], spoilageEnabled: true,
+                        junkEnabled: true, reposition: true, gatekeeper: level === 66 };
+                }
+                return { containers: 4, itemsPerContainer: 15, timeLimit: 50, spoilageEnabled: true, junkEnabled: true,
+                    gatekeeper: false };
+            }
+
+            const CATEGORIES = {
+                fruit: { items: ['🍎', '🍌', '🍓', '🍊', '🍇', '🍉', '🍒', '🍑', '🍍', '🥝', '🍅', '🍐', '🍋', '🥭', '🍈', '🍊',
+                        '🍎', '🍌', '🍓', '🍇', '🍉', '🍒', '🍑', '🍍', '🥝', '🍅', '🍐', '🍋', '🥭', '🍈'
+                    ], name: 'Fruits', emoji: '🍎' },
+                veg: { items: ['🥕', '🥦', '🌽', '🥬', '🫑', '🍆', '🥔', '🧅', '🥒', '🌶️', '🥗', '🧄', '🥑', '🍠', '🥕', '🌽', '🥦',
+                        '🥬', '🥗', '🌶️', '🥒', '🫑', '🍆', '🥔', '🧅', '🥗', '🧄', '🥑', '🍠', '🥕'
+                    ], name: 'Vegetables', emoji: '🥕' },
+                drink: { items: ['🥤', '🧃', '🍹', '🧋', '☕', '🍵', '🧉', '🍺', '🥛', '🍷', '🥂', '🍸', '🧊', '🍾', '🥤', '🧃',
+                        '🍹', '🧋', '🧉', '🥂', '🍷', '🍺', '🥛', '☕', '🍵', '🧊', '🍾', '🥤', '🧃', '🍹'
+                    ], name: 'Drinks', emoji: '🥤' },
+                fastfood: { items: ['🍔', '🍟', '🌭', '🍕', '🥪', '🥙', '🌮', '🫔', '🥨', '🍗', '🍖', '🥓', '🧇', '🥞', '🌯', '🥩',
+                        '🍳', '🧆', '🥪', '🌮', '🫔', '🥨', '🍗', '🍖', '🥓', '🧇', '🥞', '🌯', '🥩', '🍳'
+                    ], name: 'Fastfood', emoji: '🍔' },
+                sweets: { items: ['🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🧁', '🍫', '🍬', '🍭', '🧇', '🥞', '🍮', '🍰', '🥧', '🍡',
+                        '🍢', '🍯', '🍩', '🍪', '🍦', '🍧', '🍨', '🎂', '🧁', '🍫', '🍬', '🍭', '🍮', '🍰'
+                    ], name: 'Sweets', emoji: '🍦' }
+            };
+
+            // ---------- STATE ----------
+            let state = {
+                wins: { fruit: 0, veg: 0, drink: 0, fastfood: 0, sweets: 0 },
+                losses: { fruit: 0, veg: 0, drink: 0, fastfood: 0, sweets: 0 },
+                levels: { fruit: 1, veg: 1, drink: 1, fastfood: 1, sweets: 1 },
+                completedLevels: { fruit: {}, veg: {}, drink: {}, fastfood: {}, sweets: {} },
+                totalCoins: 0,
+                currentCategory: 'fruit',
+                currentLevel: 1,
+                currentScore: 0,
+                timeLeft: 40,
+                gameActive: false,
+                isPaused: false,
+                trays: [],
+                itemQueue: [],
+                timerInterval: null,
+                spoilageInterval: null,
+                gameWon: false,
+                combo: 0,
+                levelStartTime: 40,
+                earnedStars: 0,
+                junkCount: 0,
+                correctDrops: 0,
+                speedBurstActive: false,
+                speedBurstTimer: null,
+                totalSpoiled: 0,
+                levelCoinsEarned: 0,
+                mistakes: 0,
+                gatekeeperPassed: false,
+                perfectLevel: false,
+                totalJunkDiscarded: 0,
+                powerups: { slowTime: 0, magnet: 0, freeze: 0 }
+            };
+
+            try {
+                const saved = localStorage.getItem('fridgeflow_advanced_progress');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(state, parsed);
+                }
+            } catch (e) {}
+
+            let drag = { active: false, item: null, emoji: null, ghost: null, isJunk: false, isGolden: false };
+            let activeParticles = 0;
+
+            // ---------- PARTICLES ----------
+            function initBackgroundParticles() {
+                const container = document.getElementById('particles-bg');
+                for (let i = 0; i < 30; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'particle-dot';
+                    const size = 2 + Math.random() * 8;
+                    dot.style.width = size + 'px';
+                    dot.style.height = size + 'px';
+                    dot.style.left = Math.random() * 100 + '%';
+                    dot.style.top = Math.random() * 100 + '%';
+                    dot.style.animationDuration = (15 + Math.random() * 25) + 's';
+                    dot.style.animationDelay = (Math.random() * 20) + 's';
+                    container.appendChild(dot);
+                }
+            }
+            initBackgroundParticles();
+
+            function burstParticles(x, y, count = 14, colorHue = 30) {
+                count = Math.min(count, CONFIG.MAX_PARTICLES - activeParticles);
+                if (count <= 0) return;
+                activeParticles += count;
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = 4 + Math.random() * 10;
+                    const angle = Math.random() * 2 * Math.PI;
+                    const dist = 40 + Math.random() * 90;
+                    p.style.width = size + 'px';
+                    p.style.height = size + 'px';
+                    p.style.background = `hsl(${colorHue + Math.random()*20}, 40%, 70%)`;
+                    p.style.left = x + 'px';
+                    p.style.top = y + 'px';
+                    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                    p.style.setProperty('--ty', (Math.sin(angle) * dist - 30) + 'px');
+                    document.body.appendChild(p);
+                    setTimeout(() => { p.remove();
+                        activeParticles--; }, 800);
+                }
+            }
+
+            function celebrateConfetti(x, y, count = 60) {
+                const colors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6bcb', '#ff9f43', '#a29bfe', '#fd79a8'];
+                for (let i = 0; i < count; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'confetti';
+                    const size = 6 + Math.random() * 10;
+                    const angle = Math.random() * 2 * Math.PI;
+                    const dist = 100 + Math.random() * 200;
+                    el.style.cssText = `
+                        left: ${x + (Math.random() - 0.5) * 40}px;
+                        top: ${y + (Math.random() - 0.5) * 40}px;
+                        width: ${size}px;
+                        height: ${size * 0.6}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                        --dur: ${0.8 + Math.random() * 0.6}s;
+                        --tx: ${Math.cos(angle) * dist}px;
+                        --ty: ${-100 - Math.random() * 300}px;
+                        --rot: ${(Math.random() - 0.5) * 720}deg;
+                    `;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 2000);
+                }
+            }
+
+            function showFloatingText(x, y, text, color = '#A47864') {
+                const el = document.createElement('div');
+                el.className = 'floating-score';
+                el.textContent = text;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.color = color;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 900);
+            }
+
+            function shakeFridge() {
+                const body = document.getElementById('fridgeBody');
+                body.classList.add('shake');
+                setTimeout(() => body.classList.remove('shake'), 300);
+            }
+
+            // ---------- HELPERS ----------
+            function calculateCoinsEarned(level) {
+                return CONFIG.BASE_COINS;
+            }
+
+            function getStars(timeLeft, initialTime) {
+                const ratio = timeLeft / initialTime;
+                if (ratio >= 0.5) return 3;
+                if (ratio >= 0.25) return 2;
+                if (ratio > 0) return 1;
+                return 0;
+            }
+
+            function getStarBonus(stars) {
+                if (stars === 3) return 5;
+                if (stars === 2) return 3;
+                if (stars === 1) return 1;
+                return 0;
+            }
+
+            function saveProgress() {
+                try {
+                    localStorage.setItem('fridgeflow_advanced_progress', JSON.stringify(state));
+                } catch (e) {}
+            }
+
+            // ---------- UI UPDATES ----------
+            function updateStatsUI() {
+                const totalWins = Object.values(state.wins).reduce((a, b) => a + b, 0);
+                const totalLosses = Object.values(state.losses).reduce((a, b) => a + b, 0);
+                document.getElementById('winTotal').textContent = totalWins;
+                document.getElementById('lossTotal').textContent = totalLosses;
+                for (const cat of ['fruit', 'veg', 'drink', 'fastfood', 'sweets']) {
+                    document.getElementById(cat + 'WL').textContent = `${state.wins[cat]}/${state.losses[cat]}`;
+                    document.getElementById(cat + 'Level').textContent = `Lvl ${state.levels[cat]}/70`;
+                }
+                document.getElementById('totalCoins').textContent = state.totalCoins;
+                document.getElementById('levelPageCoins').textContent = state.totalCoins;
+                const achCount = Object.values(achievements).filter(a => a.unlocked).length;
+                document.getElementById('achievementCount').textContent = achCount;
+                saveProgress();
+            }
+
+            // ---------- UNLOCK ----------
+            function unlockGatekeeperWithCoins(category, levelNum) {
+                const cost = getGatekeeperCost(levelNum);
+                if (state.totalCoins < cost) {
+                    alert(`Not enough coins! Need ${cost} coins. You have ${state.totalCoins}.`);
+                    return false;
+                }
+                if (state.levels[category] > levelNum) {
+                    alert('This level is already unlocked!');
+                    return false;
+                }
+                if (state.completedLevels[category][levelNum]) {
+                    alert('Level already completed!');
+                    return false;
+                }
+                if (levelNum !== state.levels[category]) {
+                    alert('You can only unlock the current gatekeeper level!');
+                    return false;
+                }
+                state.totalCoins -= cost;
+                state.levels[category] = levelNum + 1;
+                state.completedLevels[category][levelNum] = 0;
+                updateStatsUI();
+                renderLevelGrid(category);
+                playClickSound();
+                playCoinSound();
+                alert(`🎉 Level ${levelNum} unlocked with ${cost} coins!`);
+                return true;
+            }
+
+            // ---------- RENDER LEVEL GRID ----------
+            function renderLevelGrid(category) {
+                const grid = document.getElementById('levelGrid');
+                if (!grid) return;
+                grid.innerHTML = '';
+                const currentUnlocked = state.levels[category];
+                const completed = state.completedLevels[category] || {};
+
+                for (let i = 1; i <= CONFIG.MAX_LEVEL; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'level-card';
+                    const stars = completed[i] || 0;
+
+                    if (isGatekeeperLevel(i)) {
+                        card.classList.add('gatekeeper');
+                    }
+
+                    if (stars > 0) {
+                        card.classList.add('completed');
+                        card.dataset.stars = stars;
+                    } else if (i === currentUnlocked) {
+                        card.classList.add('active');
+                    } else if (i > currentUnlocked) {
+                        card.classList.add('locked');
+                        if (isGatekeeperLevel(i)) {
+                            card.classList.add('gatekeeper');
+                        }
+                    }
+
+                    const starStr = stars > 0 ? '⭐'.repeat(stars) + '☆'.repeat(3 - stars) : '';
+
+                    card.innerHTML = `
+                        <div class="level-number">${i}</div>
+                        <div class="level-stars">${starStr}</div>
+                        <div class="level-status">${stars > 0 ? '✓' : (i === currentUnlocked ? '🔓' : '🔒')}</div>
+                        <div class="level-coins-badge">🪙${calculateCoinsEarned(i)}</div>
+                    `;
+
+                    if (isGatekeeperLevel(i) && i > currentUnlocked && !completed[i]) {
+                        const cost = getGatekeeperCost(i);
+                        const unlockBtn = document.createElement('div');
+                        unlockBtn.className = 'unlock-btn';
+                        unlockBtn.textContent = `🔓 UNLOCK (${cost}🪙)`;
+                        unlockBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            unlockGatekeeperWithCoins(category, i);
+                        };
+                        card.appendChild(unlockBtn);
+                    }
+
+                    card.addEventListener('click', () => {
+                        if (i <= currentUnlocked || completed[i]) {
+                            playClickSound();
+                            startGameWithLevel(category, i);
+                        }
+                    });
+                    grid.appendChild(card);
+                }
+
+                const completedCount = Object.values(completed).filter(v => v > 0).length;
+                document.getElementById('unlockedCount').textContent = currentUnlocked;
+                document.getElementById('completedCount').textContent = completedCount;
+            }
+
+            // ---------- GAME CORE ----------
+            function startGameWithLevel(category, level) {
+                initAudio();
+                if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+
+                state.currentCategory = category;
+                state.currentLevel = level;
+                state.currentScore = 0;
+                state.combo = 0;
+                state.gameWon = false;
+                state.isPaused = false;
+                state.junkCount = 0;
+                state.correctDrops = 0;
+                state.totalSpoiled = 0;
+                state.levelCoinsEarned = 0;
+                state.mistakes = 0;
+                state.perfectLevel = false;
+                state.gatekeeperPassed = false;
+                state.earnedStars = 0;
+                state.speedBurstActive = false;
+                if (state.speedBurstTimer) { clearTimeout(state.speedBurstTimer);
+                    state.speedBurstTimer = null; }
+                if (state.spoilageInterval) { clearInterval(state.spoilageInterval);
+                    state.spoilageInterval = null; }
+                if (state.timerInterval) clearInterval(state.timerInterval);
+
+                state.trays = [];
+                state.itemQueue = [];
+
+                const config = getLevelConfig(level);
+                const initialTime = config.timeLimit;
+                state.timeLeft = initialTime;
+                state.levelStartTime = initialTime;
+
+                document.getElementById('gameScore').textContent = '0';
+                document.getElementById('gameTime').textContent = initialTime;
+                document.getElementById('gameTime').style.color = '';
+                document.getElementById('gameProgress').style.width = '0%';
+                document.getElementById('currentLevel').textContent = level;
+                document.getElementById('levelCoins').textContent = calculateCoinsEarned(level);
+                document.getElementById('comboDisplay').textContent = 'x1';
+                document.getElementById('junkCount').textContent = '0';
+                document.getElementById('pauseOverlay').classList.add('hidden');
+                document.getElementById('pauseBtn').textContent = '⏸️';
+
+                document.body.classList.remove('low-time');
+
+                const gatekeeperBadge = document.getElementById('gatekeeperBadge');
+                if (config.gatekeeper) {
+                    gatekeeperBadge.style.display = 'inline';
+                } else {
+                    gatekeeperBadge.style.display = 'none';
+                }
+
+                const instr = document.getElementById('gameInstructions');
+                if (instr) instr.style.display = 'block';
+
+                state.gameActive = true;
+                buildFridge(category, level, config);
+                fillItemQueue(config);
+                updateItemBelt();
+
+                const door = document.getElementById('door');
+                door.classList.remove('open');
+                door.onclick = () => door.classList.toggle('open');
+
+                const trashBin = document.getElementById('trashBin');
+                trashBin.onclick = () => {};
+
+                startTimer();
+                if (config.spoilageEnabled) {
+                    startSpoilageTimer();
+                }
+                showPage('gamePage');
+            }
+
+            function buildFridge(category, level, config) {
+                const items = CATEGORIES[category].items;
+                const fridgeBody = document.getElementById('fridgeBody');
+                fridgeBody.innerHTML =
+                    `<div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,#FFFDF8,transparent 80%);opacity:0.4;pointer-events:none;"></div><div class="temp-display">❄️ 4°C</div>`;
+                state.trays = [];
+
+                const numContainers = config.containers;
+                const itemsPerContainer = config.itemsPerContainer;
+                const reposition = config.reposition || false;
+
+                const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+                const selectedItems = shuffledItems.slice(0, numContainers);
+
+                let rows = [];
+                if (numContainers === 2) {
+                    rows = [2];
+                } else if (numContainers === 3) {
+                    rows = [3];
+                } else if (numContainers === 4) {
+                    rows = [2, 2];
+                } else if (numContainers === 5) {
+                    rows = [3, 2];
+                } else if (numContainers === 6) {
+                    rows = [3, 3];
+                } else {
+                    rows = [2, 2];
+                }
+
+                if (reposition && rows.length > 1) {
+                    rows = rows.reverse();
+                }
+
+                let trayIndex = 0;
+                for (let row = 0; row < rows.length; row++) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'shelf-row';
+                    const numInRow = rows[row];
+
+                    for (let i = 0; i < numInRow && trayIndex < selectedItems.length; i++) {
+                        const pos = i === 0 ? 'left' : (i === numInRow - 1 ? 'right' : 'center');
+                        const shelf = createShelf(selectedItems[trayIndex], pos, itemsPerContainer);
+                        if (numInRow === 3) {
+                            shelf.style.width = '31%';
+                        } else if (numInRow > 3) {
+                            shelf.style.width = '31%';
+                        }
+                        rowDiv.appendChild(shelf);
+                        const trayObj = {
+                            el: shelf,
+                            badge: shelf.querySelector('.tray-badge'),
+                            current: 0,
+                            max: itemsPerContainer,
+                            emoji: selectedItems[trayIndex],
+                            spoilageTimer: 35,
+                            maxSpoilage: 35,
+                            spoiling: false,
+                            poisoned: false
+                        };
+                        state.trays.push(trayObj);
+                        shelf._trayData = trayObj;
+                        trayIndex++;
+                    }
+
+                    if (rowDiv.children.length) fridgeBody.appendChild(rowDiv);
+                }
+            }
+
+            function createShelf(emoji, pos, maxItems) {
+                const shelf = document.createElement('div');
+                shelf.className = `shelf ${pos}`;
+                shelf.innerHTML = `
+                    <div class="shelf-content">
+                        <div class="tray-compartment">
+                            <div class="tray-cell">${emoji}</div>
+                            <span class="tray-badge">0/${maxItems}</span>
+                        </div>
+                    </div>
+                    <div class="spoilage-bar" style="width:100%;"></div>
+                `;
+                return shelf;
+            }
+
+            function fillItemQueue(config) {
+                const available = state.trays.filter(t => t.current < t.max && !t.poisoned);
+                if (available.length === 0) { state.itemQueue = []; return; }
+
+                const junkChance = config.junkEnabled ? 0.1 : 0;
+                const goldenChance = CONFIG.GOLDEN_CHANCE;
+
+                state.itemQueue = [];
+                const queueLength = 14;
+                for (let i = 0; i < queueLength; i++) {
+                    if (Math.random() < goldenChance) {
+                        const rand = available[Math.floor(Math.random() * available.length)];
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: true });
+                        continue;
+                    }
+                    if (Math.random() < junkChance) {
+                        const junk = CONFIG.JUNK_ITEMS[Math.floor(Math.random() * CONFIG.JUNK_ITEMS.length)];
+                        state.itemQueue.push({ emoji: junk, isJunk: true, isGolden: false });
+                    } else {
+                        const rand = available[Math.floor(Math.random() * available.length)];
+                        state.itemQueue.push({ emoji: rand.emoji, isJunk: false, isGolden: false });
+                    }
+                }
+            }
+
+            function updateItemBelt() {
+                const belt = document.getElementById('gameItems');
+                if (!belt) return;
+                belt.innerHTML = '';
+                if (state.gameWon || !state.gameActive || state.isPaused) return;
+
+                const available = state.trays.filter(t => t.current < t.max && !t.poisoned);
+                if (available.length === 0) {
+                    belt.innerHTML = '<div style="opacity:0.5; color:#2D1A12;">✨ All full! ✨</div>';
+                    return;
+                }
+
+                if (state.speedBurstActive) {
+                    belt.classList.add('speed-burst');
+                } else {
+                    belt.classList.remove('speed-burst');
+                }
+
+                const displayCount = state.speedBurstActive ? 10 : 8;
+                const displayItems = state.itemQueue.slice(0, displayCount);
+
+                displayItems.forEach(item => {
+                    const el = document.createElement('span');
+                    el.className = 'item';
+                    if (item.isJunk) el.classList.add('junk');
+                    if (item.isGolden) el.classList.add('golden');
+                    el.textContent = item.emoji;
+                    el._isJunk = item.isJunk || false;
+                    el._isGolden = item.isGolden || false;
+
+                    el.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
+                        startDrag(el, item.emoji, e.clientX, e.clientY, item.isJunk, item.isGolden);
+                    });
+                    belt.appendChild(el);
+                });
+            }
+
+            function startDrag(item, emoji, x, y, isJunk = false, isGolden = false) {
+                if (!state.gameActive || state.gameWon || state.isPaused) return;
+                drag.active = true;
+                drag.item = item;
+                drag.emoji = emoji;
+                drag.isJunk = isJunk;
+                drag.isGolden = isGolden;
+
+                drag.ghost = document.createElement('div');
+                drag.ghost.className = 'drag-ghost';
+                if (isJunk) drag.ghost.classList.add('junk');
+                if (isGolden) drag.ghost.classList.add('golden');
+                drag.ghost.textContent = emoji;
+                document.body.appendChild(drag.ghost);
+                drag.ghost.style.left = x + 'px';
+                drag.ghost.style.top = y + 'px';
+                item.style.opacity = '0.3';
+
+                if (!isJunk) {
+                    state.trays.forEach(tray => {
+                        if (tray.emoji === emoji && tray.current < tray.max && !tray.poisoned)
+                            tray.el.classList.add('highlight');
+                    });
+                }
+
+                const trashBin = document.getElementById('trashBin');
+                if (isJunk) {
+                    trashBin.classList.add('active');
+                } else {
+                    trashBin.classList.remove('active');
+                }
+            }
+
+            document.addEventListener('pointermove', (e) => {
+                if (drag.active && drag.ghost) {
+                    drag.ghost.style.left = e.clientX + 'px';
+                    drag.ghost.style.top = e.clientY + 'px';
+                }
+            });
+
+            document.addEventListener('pointerup', (e) => {
+                if (drag.active) {
+                    endDrag(e.clientX, e.clientY);
+                }
+            });
+
+            function endDrag(x, y) {
+                if (!drag.active) return;
+                const instr = document.getElementById('gameInstructions');
+                if (instr) instr.style.display = 'none';
+
+                const trashBin = document.getElementById('trashBin');
+                const trashRect = trashBin.getBoundingClientRect();
+                const isOnTrash = x >= trashRect.left && x <= trashRect.right &&
+                    y >= trashRect.top && y <= trashRect.bottom;
+
+                if (drag.isJunk && isOnTrash) {
+                    state.junkCount++;
+                    state.totalJunkDiscarded++;
+                    document.getElementById('junkCount').textContent = state.junkCount;
+                    showFloatingText(x, y - 30, '🗑️ DISCARDED', '#A47864');
+                    burstParticles(x, y, 8, 20);
+                    playClickSound();
+                    playCoinSound();
+
+                    if (drag.item && drag.item.parentNode) drag.item.remove();
+                    const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk);
+                    if (idx !== -1) state.itemQueue.splice(idx, 1);
+                    if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
+                    updateItemBelt();
+                    cleanupDrag();
+                    checkAchievements(state);
+                    return;
+                }
+
+                if (drag.isJunk) {
+                    const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
+                    'shelf'));
+                    if (targetEl) {
+                        const tray = state.trays.find(t => t.el === targetEl);
+                        if (tray && !tray.poisoned && tray.current < tray.max) {
+                            tray.poisoned = true;
+                            tray.el.classList.add('poisoned');
+                            tray.current = Math.max(0, tray.current - 2);
+                            tray.badge.textContent = `${tray.current}/${tray.max}`;
+                            state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE * 2);
+                            document.getElementById('gameScore').textContent = state.currentScore;
+                            state.combo = 0;
+                            state.mistakes++;
+                            document.getElementById('comboDisplay').textContent = 'x1';
+                            shakeFridge();
+                            showFloatingText(x, y - 30, '💀 POISONED!', '#BF5722');
+                            burstParticles(x, y, 20, 0);
+                            playJunkSound();
+                            if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+
+                            if (drag.item && drag.item.parentNode) drag.item.remove();
+                            const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag
+                            .isJunk);
+                            if (idx !== -1) state.itemQueue.splice(idx, 1);
+                            if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
+                            updateItemBelt();
+                            updateProgressBar();
+                            cleanupDrag();
+
+                            if (state.trays.every(t => t.current >= t.max || t.poisoned)) endGame('win');
+                            return;
+                        }
+                    }
+                }
+
+                const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
+                if (targetEl && !drag.isJunk) {
+                    const tray = state.trays.find(t => t.el === targetEl);
+                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state
+                        .gameWon && !state.isPaused) {
+                        // SUCCESS
+                        tray.current++;
+                        tray.badge.textContent = `${tray.current}/${tray.max}`;
+                        tray.spoilageTimer = tray.maxSpoilage;
+                        tray.spoiling = false;
+                        tray.el.classList.remove('spoiling');
+                        tray.el.querySelector('.spoilage-bar').style.width = '100%';
+                        tray.el.querySelector('.spoilage-bar').className = 'spoilage-bar';
+
+                        if (tray.current >= tray.max) {
+                            tray.el.classList.add('full');
+                            setTimeout(() => tray.el.classList.remove('full'), 500);
+                            tray.el.classList.add('hidden-tray');
+                        }
+
+                        state.correctDrops++;
+                        state.combo++;
+                        const multiplier = Math.min(state.combo, 5);
+                        let points = CONFIG.POINTS_PER_ITEM * multiplier;
+                        if (drag.isGolden) {
+                            points *= 2;
+                            showFloatingText(x, y - 60, '✨ GOLDEN! x2', '#FFD700');
+                            burstParticles(x, y, 20, 45);
+                        }
+                        state.currentScore += points;
+                        document.getElementById('gameScore').textContent = state.currentScore;
+                        document.getElementById('comboDisplay').textContent = `x${multiplier}`;
+
+                        const color = multiplier >= 4 ? '#ffd700' : (multiplier >= 2 ? '#ffe66d' : '#8BA888');
+                        showFloatingText(x, y - 30, `+${points} x${multiplier}`, color);
+                        burstParticles(x, y, 14, 30);
+
+                        if (drag.item && drag.item.parentNode) drag.item.remove();
+                        const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
+                            i.isGolden === drag.isGolden);
+                        if (idx !== -1) state.itemQueue.splice(idx, 1);
+                        if (state.itemQueue.length < 5) fillItemQueue(getLevelConfig(state.currentLevel));
+                        updateItemBelt();
+                        updateProgressBar();
+                        playCorrectSound();
+                        if (navigator.vibrate) navigator.vibrate(10);
+
+                        if (state.combo >= 5) checkAchievements(state);
+
+                        if (state.correctDrops % 5 === 0) {
+                            triggerSpeedBurst();
+                        }
+
+                        if (state.trays.every(t => t.current >= t.max || t.poisoned)) endGame('win');
+                    } else {
+                        // FAILURE
+                        state.combo = 0;
+                        state.mistakes++;
+                        document.getElementById('comboDisplay').textContent = 'x1';
+                        state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
+                        document.getElementById('gameScore').textContent = state.currentScore;
+                        shakeFridge();
+                        if (tray && tray.poisoned) {
+                            showFloatingText(x, y - 30, '☠️ SHELF POISONED!', '#BF5722');
+                        } else {
+                            showFloatingText(x, y - 30, 'WRONG!', '#BF5722');
+                        }
+                        playWrongSound();
+                        if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+                    }
+                } else if (!drag.isJunk) {
+                    // MISS
+                    state.combo = 0;
+                    state.mistakes++;
+                    document.getElementById('comboDisplay').textContent = 'x1';
+                    state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
+                    document.getElementById('gameScore').textContent = state.currentScore;
+                    shakeFridge();
+                    showFloatingText(x, y - 30, 'MISS!', '#BF5722');
+                    playWrongSound();
+                    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+                }
+
+                cleanupDrag();
+                document.getElementById('trashBin').classList.remove('active');
+            }
+
+            function cleanupDrag() {
+                if (drag.ghost && drag.ghost.parentNode) drag.ghost.remove();
+                if (drag.item) drag.item.style.opacity = '1';
+                state.trays.forEach(t => t.el.classList.remove('highlight'));
+                document.getElementById('trashBin').classList.remove('active');
+                drag.active = false;
+                drag.item = null;
+                drag.ghost = null;
+                drag.isJunk = false;
+                drag.isGolden = false;
+            }
+
+            function triggerSpeedBurst() {
+                if (state.speedBurstActive) return;
+                state.speedBurstActive = true;
+                playSpeedBurstSound();
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚡ SPEED BURST!', '#E8A14A');
+                document.getElementById('gameItems').classList.add('speed-burst');
+
+                if (state.speedBurstTimer) clearTimeout(state.speedBurstTimer);
+                state.speedBurstTimer = setTimeout(() => {
+                    state.speedBurstActive = false;
+                    document.getElementById('gameItems').classList.remove('speed-burst');
+                    updateItemBelt();
+                }, 5000);
+                updateItemBelt();
+            }
+
+            function updateProgressBar() {
+                const total = state.trays.reduce((s, t) => s + t.current, 0);
+                const maxTotal = state.trays.reduce((s, t) => s + t.max, 0);
+                const percent = maxTotal ? (total / maxTotal) * 100 : 0;
+                document.getElementById('gameProgress').style.width = `${percent}%`;
+            }
+
+            // ---------- SPOILAGE ----------
+            function startSpoilageTimer() {
+                if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                state.spoilageInterval = setInterval(() => {
+                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+
+                    state.trays.forEach(tray => {
+                        if (tray.current >= tray.max || tray.poisoned) return;
+
+                        tray.spoilageTimer -= 1;
+                        const ratio = Math.max(0, tray.spoilageTimer / tray.maxSpoilage);
+                        const bar = tray.el.querySelector('.spoilage-bar');
+                        if (bar) {
+                            bar.style.width = (ratio * 100) + '%';
+                            if (ratio < 0.3) {
+                                bar.className = 'spoilage-bar danger';
+                                tray.el.classList.add('spoiling');
+                                tray.spoiling = true;
+                            } else if (ratio < 0.6) {
+                                bar.className = 'spoilage-bar warning';
+                                tray.el.classList.remove('spoiling');
+                                tray.spoiling = false;
+                            } else {
+                                bar.className = 'spoilage-bar';
+                                tray.el.classList.remove('spoiling');
+                                tray.spoiling = false;
+                            }
+                        }
+
+                        if (tray.spoilageTimer <= 0) {
+                            if (tray.current > 0) {
+                                tray.current--;
+                                tray.badge.textContent = `${tray.current}/${tray.max}`;
+                                if (tray.current < tray.max) {
+                                    tray.el.classList.remove('hidden-tray');
+                                }
+                                state.totalSpoiled++;
+                                state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
+                                document.getElementById('gameScore').textContent = state.currentScore;
+                                state.combo = 0;
+                                state.mistakes++;
+                                document.getElementById('comboDisplay').textContent = 'x1';
+
+                                const rect = tray.el.getBoundingClientRect();
+                                const cx = rect.left + rect.width / 2;
+                                const cy = rect.top + rect.height / 2;
+                                showFloatingText(cx, cy - 20, '💨 SPOILED!', '#BF5722');
+                                burstParticles(cx, cy, 10, 0);
+                                playSpoilageSound();
+                                shakeFridge();
+
+                                tray.spoilageTimer = tray.maxSpoilage * (0.7 + Math.random() * 0.3);
+                                tray.maxSpoilage = tray.spoilageTimer;
+
+                                if (tray.current <= 0) {
+                                    tray.spoiling = false;
+                                    tray.el.classList.remove('spoiling');
+                                    const barEl = tray.el.querySelector('.spoilage-bar');
+                                    if (barEl) { barEl.style.width = '100%';
+                                        barEl.className = 'spoilage-bar'; }
+                                    tray.spoilageTimer = tray.maxSpoilage;
+                                }
+                            } else {
+                                tray.spoilageTimer = tray.maxSpoilage * 0.5;
+                            }
+                            updateProgressBar();
+                        }
+                    });
+                }, 1000);
+            }
+
+            // ---------- TIMER ----------
+            function startTimer() {
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                state.timerInterval = setInterval(() => {
+                    if (!state.gameActive || state.gameWon || state.isPaused) return;
+                    state.timeLeft--;
+                    document.getElementById('gameTime').textContent = state.timeLeft;
+
+                    if (state.timeLeft <= 15) {
+                        document.getElementById('gameTime').style.color = '#BF5722';
+                        document.body.classList.add('low-time');
+                    } else {
+                        document.getElementById('gameTime').style.color = '';
+                        document.body.classList.remove('low-time');
+                    }
+
+                    if (state.timeLeft <= 0) endGame('loss');
+                }, 1000);
+            }
+
+            function togglePause() {
+                if (!state.gameActive || state.gameWon) return;
+                state.isPaused = !state.isPaused;
+                const overlay = document.getElementById('pauseOverlay');
+                const btn = document.getElementById('pauseBtn');
+                if (state.isPaused) {
+                    overlay.classList.remove('hidden');
+                    btn.textContent = '▶️';
+                } else {
+                    overlay.classList.add('hidden');
+                    btn.textContent = '⏸️';
+                    if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+                    updateItemBelt();
+                }
+            }
+
+            // ---------- RETRY ----------
+            function retryLevel() {
+                if (state.totalCoins < CONFIG.RETRY_COST) {
+                    alert(`Need ${CONFIG.RETRY_COST} coin to retry! You have ${state.totalCoins}.`);
+                    return;
+                }
+                state.totalCoins -= CONFIG.RETRY_COST;
+                updateStatsUI();
+                startGameWithLevel(state.currentCategory, state.currentLevel);
+            }
+
+            // ---------- END GAME ----------
+            function endGame(result) {
+                if (!state.gameActive) return;
+                state.gameActive = false;
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                if (state.speedBurstTimer) clearTimeout(state.speedBurstTimer);
+                document.body.classList.remove('low-time');
+
+                const timeBonus = Math.floor(state.timeLeft / 10) * 2;
+                const totalScore = state.currentScore + timeBonus;
+                let stars = 0;
+                let coinsEarned = 0;
+                const isGatekeeper = isGatekeeperLevel(state.currentLevel);
+
+                if (result === 'win') {
+                    const level = state.currentLevel;
+                    const baseCoins = calculateCoinsEarned(level);
+                    stars = getStars(state.timeLeft, state.levelStartTime);
+                    state.earnedStars = stars;
+                    const starBonus = getStarBonus(stars);
+                    coinsEarned = baseCoins + starBonus;
+
+                    if (stars === 3 && state.mistakes === 0) {
+                        state.perfectLevel = true;
+                        coinsEarned += 5;
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 100,
+                            '🏆 PERFECT! +5🪙', '#ffd700');
+                        celebrateConfetti(window.innerWidth / 2, window.innerHeight / 2, 80);
+                    }
+
+                    state.totalCoins += coinsEarned;
+                    state.levelCoinsEarned = coinsEarned;
+                    state.completedLevels[state.currentCategory][level] = stars;
+
+                    if (level === state.levels[state.currentCategory] && level < CONFIG.MAX_LEVEL) {
+                        if (isGatekeeper) {
+                            if (stars === 3) {
+                                state.levels[state.currentCategory]++;
+                                state.gatekeeperPassed = true;
+                            }
+                        } else {
+                            state.levels[state.currentCategory]++;
+                        }
+                    }
+                    state.wins[state.currentCategory]++;
+
+                    let titleText = '🧊 FRIDGE MASTER!';
+                    let msgText =
+                        `Level ${level} completed! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+
+                    if (state.mistakes === 0) msgText += '\n⭐ PERFECT! No mistakes!';
+
+                    if (isGatekeeper && stars < 3) {
+                        const cost = getGatekeeperCost(level);
+                        titleText = '⭐ GATEKEEPER LEVEL!';
+                        msgText =
+                            `Level ${level} completed, but you need 3 stars to unlock the next block!\nYou got ${stars} star${stars > 1 ? 's' : ''}. Retry for 3 stars or unlock with ${cost} coins!`;
+                    } else if (isGatekeeper && stars === 3) {
+                        titleText = '⭐ GATEKEEPER MASTERED!';
+                        msgText =
+                            `Level ${level} completed with 3 stars! The next block is now unlocked! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+                        celebrateConfetti(window.innerWidth / 2, window.innerHeight / 2, 60);
+                    }
+
+                    document.getElementById('resultTitle').textContent = titleText;
+                    document.getElementById('resultMessage').textContent = msgText;
+                    document.getElementById('coinsEarned').textContent = `+${coinsEarned}`;
+
+                    const gatekeeperMsg = document.getElementById('gatekeeperMessage');
+                    if (isGatekeeper && stars < 3) {
+                        gatekeeperMsg.style.display = 'block';
+                        gatekeeperMsg.textContent =
+                            `⭐ You got ${stars} star${stars > 1 ? 's' : ''}. You need 3 stars to unlock the next block! Retry or unlock with ${getGatekeeperCost(level)} coins!`;
+                        gatekeeperMsg.style.color = '#BF5722';
+                    } else if (isGatekeeper && stars === 3) {
+                        gatekeeperMsg.style.display = 'block';
+                        gatekeeperMsg.textContent = '⭐ 3 Stars! Gatekeeper passed! Next block unlocked! 🎉';
+                        gatekeeperMsg.style.color = '#8BA888';
+                    } else {
+                        gatekeeperMsg.style.display = 'none';
+                    }
+
+                    const effect = document.createElement('div');
+                    effect.className = 'victory-effect';
+                    effect.style.cssText =
+                        'position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,rgba(164,120,100,0.15),transparent 70%);animation:victoryPulse 1s ease-out;z-index:999;';
+                    document.body.appendChild(effect);
+                    setTimeout(() => effect.remove(), 1000);
+                    playVictorySound();
+                    if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+
+                    checkAchievements(state);
+                } else {
+                    state.losses[state.currentCategory]++;
+                    document.getElementById('resultTitle').textContent = '😅 OUT OF TIME, CHEF!';
+                    document.getElementById('resultMessage').textContent = 'Don\'t let the groceries spoil! Retry!';
+                    document.getElementById('coinsEarned').textContent = '0';
+                    document.getElementById('gatekeeperMessage').style.display = 'none';
+                    playWrongSound();
+                }
+
+                const starStr = stars > 0 ? '⭐'.repeat(stars) + '☆'.repeat(3 - stars) : '☆☆☆';
+                document.getElementById('starDisplay').textContent = starStr;
+                document.getElementById('finalScore').textContent = totalScore;
+                document.getElementById('timeBonus').textContent = `+${timeBonus}`;
+                updateStatsUI();
+                renderVictoryButtons(result === 'win', state.currentLevel, stars, isGatekeeper);
+                document.getElementById('resultModal').classList.add('show');
+                cleanupDrag();
+            }
+
+            function renderVictoryButtons(isWin, level, stars, isGatekeeper) {
+                const container = document.getElementById('victoryButtons');
+                container.innerHTML = '';
+
+                if (isWin) {
+                    const playAgain = document.createElement('button');
+                    playAgain.className = 'btn-small';
+                    playAgain.textContent = '🔄 REMATCH';
+                    playAgain.onclick = () => {
+                        document.getElementById('resultModal').classList.remove('show');
+                        retryLevel();
+                    };
+                    container.appendChild(playAgain);
+
+                    if (level < CONFIG.MAX_LEVEL) {
+                        const canAdvance = !isGatekeeper || stars === 3;
+                        if (canAdvance) {
+                            const next = document.createElement('button');
+                            next.className = 'btn-small';
+                            next.style.background = '#A47864';
+                            next.style.color = '#FDF6E3';
+                            next.innerHTML = '➡️ NEXT ROUND ➡️';
+                            next.onclick = () => {
+                                document.getElementById('resultModal').classList.remove('show');
+                                startGameWithLevel(state.currentCategory, level + 1);
+                            };
+                            container.appendChild(next);
+                        } else {
+                            const retry3 = document.createElement('button');
+                            retry3.className = 'btn-small';
+                            retry3.style.background = '#E8A14A';
+                            retry3.style.color = '#2D1A12';
+                            retry3.innerHTML = '⭐ RETRY FOR 3 STARS';
+                            retry3.onclick = () => {
+                                document.getElementById('resultModal').classList.remove('show');
+                                retryLevel();
+                            };
+                            container.appendChild(retry3);
+
+                            const cost = getGatekeeperCost(level);
+                            const unlockBtn = document.createElement('button');
+                            unlockBtn.className = 'btn-small';
+                            unlockBtn.style.background = '#8B645A';
+                            unlockBtn.style.color = '#FDF6E3';
+                            unlockBtn.innerHTML = `🪙 UNLOCK (${cost})`;
+                            unlockBtn.onclick = () => {
+                                document.getElementById('resultModal').classList.remove('show');
+                                const success = unlockGatekeeperWithCoins(state.currentCategory, level);
+                                if (success) {
+                                    showLevelPage(state.currentCategory);
+                                }
+                            };
+                            container.appendChild(unlockBtn);
+                        }
+                    }
+
+                    const levelsBtn = document.createElement('button');
+                    levelsBtn.className = 'btn-small';
+                    levelsBtn.textContent = '📂 LEVELS';
+                    levelsBtn.onclick = () => {
+                        document.getElementById('resultModal').classList.remove('show');
+                        showLevelPage(state.currentCategory);
+                    };
+                    container.appendChild(levelsBtn);
+                } else {
+                    const retry = document.createElement('button');
+                    retry.className = 'btn-small';
+                    retry.textContent = `🔄 RETRY (${CONFIG.RETRY_COST}🪙)`;
+                    retry.onclick = () => {
+                        document.getElementById('resultModal').classList.remove('show');
+                        retryLevel();
+                    };
+                    container.appendChild(retry);
+
+                    const levelsBtn = document.createElement('button');
+                    levelsBtn.className = 'btn-small';
+                    levelsBtn.textContent = '📂 LEVELS';
+                    levelsBtn.onclick = () => {
+                        document.getElementById('resultModal').classList.remove('show');
+                        showLevelPage(state.currentCategory);
+                    };
+                    container.appendChild(levelsBtn);
+                }
+            }
+
+            // ---------- NAVIGATION ----------
+            function showPage(pageId) {
+                const pages = ['welcomePage', 'categoryPage', 'levelPage', 'gamePage'];
+                pages.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+                document.getElementById(pageId).classList.remove('hidden');
+                if (pageId !== 'gamePage') cleanupDrag();
+                if (pageId === 'categoryPage') {
+                    updateStatsUI();
+                    checkAchievements(state);
+                }
+                if (pageId === 'gamePage') {
+                    if (!state.isPaused) document.getElementById('pauseOverlay').classList.add('hidden');
+                }
+            }
+
+            function showLevelPage(category) {
+                state.currentCategory = category;
+                const catData = CATEGORIES[category];
+                document.getElementById('selectedCategoryTitle').innerHTML = `${catData.emoji} ${catData.name}`;
+                renderLevelGrid(category);
+                showPage('levelPage');
+            }
+
+            // ---------- SETTINGS ----------
+            function setupSettings() {
+                const toggleBtn = document.getElementById('settingsToggle');
+                const panel = document.getElementById('settingsPanel');
+                let settingsVisible = false;
+                toggleBtn.onclick = () => {
+                    settingsVisible = !settingsVisible;
+                    panel.classList.toggle('hidden', !settingsVisible);
+                };
+                document.getElementById('soundToggleSettings').onclick = () => {
+                    soundEnabled = !soundEnabled;
+                    document.getElementById('soundToggleSettings').textContent = soundEnabled ? 'ON' : 'OFF';
+                    playClickSound();
+                };
+                document.getElementById('resetProgressBtn').onclick = () => {
+                    if (confirm('Reset all progress? This cannot be undone!')) {
+                        localStorage.removeItem('fridgeflow_advanced_progress');
+                        localStorage.removeItem('fridgeflow_achievements');
+                        location.reload();
+                    }
+                };
+                document.getElementById('gameSettingsToggle').onclick = () => {
+                    document.getElementById('backToLevels').click();
+                    setTimeout(() => {
+                        const catToggle = document.getElementById('settingsToggle');
+                        if (catToggle) catToggle.click();
+                    }, 100);
+                };
+            }
+
+            // ---------- EVENTS ----------
+            function attachEvents() {
+                document.getElementById('startBtn').onclick = () => { playClickSound();
+                    showPage('categoryPage'); };
+                document.getElementById('backFromCat').onclick = () => { playClickSound();
+                    showPage('welcomePage'); };
+                document.getElementById('backToCategory').onclick = () => { playClickSound();
+                    showPage('categoryPage'); };
+                document.getElementById('backToLevels').onclick = () => {
+                    playClickSound();
+                    if (state.timerInterval) clearInterval(state.timerInterval);
+                    if (state.spoilageInterval) clearInterval(state.spoilageInterval);
+                    state.gameActive = false;
+                    document.body.classList.remove('low-time');
+                    showLevelPage(state.currentCategory);
+                };
+                document.getElementById('selectFruit').onclick = () => { playClickSound();
+                    showLevelPage('fruit'); };
+                document.getElementById('selectVeg').onclick = () => { playClickSound();
+                    showLevelPage('veg'); };
+                document.getElementById('selectDrink').onclick = () => { playClickSound();
+                    showLevelPage('drink'); };
+                document.getElementById('selectFastfood').onclick = () => { playClickSound();
+                    showLevelPage('fastfood'); };
+                document.getElementById('selectSweets').onclick = () => { playClickSound();
+                    showLevelPage('sweets'); };
+
+                document.getElementById('pauseBtn').onclick = togglePause;
+                document.getElementById('resumeBtn').onclick = togglePause;
+
+                setupSettings();
+            }
+
+            // ---------- INIT ----------
+            updateStatsUI();
+            attachEvents();
+            showPage('welcomePage');
+
+            document.body.addEventListener('click', function initAudioOnFirstClick() {
+                initAudio();
+                if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+                document.body.removeEventListener('click', initAudioOnFirstClick);
+            });
+
+            setTimeout(() => checkAchievements(state), 500);
+
+        })();
+    </script>
+</body>
+</html>
