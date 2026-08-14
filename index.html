@@ -301,6 +301,7 @@
             pointer-events: none;
         }
         .fridge-door.open { transform: rotateY(150deg); }
+        .fridge-door.open .door-label { display: none; }
         .handle {
             position: absolute;
             left: 10px;
@@ -464,14 +465,15 @@
         .item-belt {
             background: rgba(0,0,0,0.03);
             border-radius: 40px;
-            padding: 0.5rem;
+            padding: 0.6rem 0.8rem;
             margin: 0.4rem 0;
             border: 1px dashed rgba(164, 120, 100, 0.2);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 0.5rem;
-            min-height: 3.5rem;
+            align-items: center;
+            gap: 0.6rem;
+            min-height: 4rem;
             backdrop-filter: blur(4px);
             position: relative;
             z-index: 20;
@@ -481,6 +483,8 @@
             font-size: 1.6rem;
             width: 2.6rem;
             height: 2.6rem;
+            flex-shrink: 0;
+            flex-grow: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -748,11 +752,12 @@
             .tray-cell { width: 1.6rem; height: 1.6rem; font-size: 1rem; }
             .tray-badge { font-size: 0.5rem; min-width: 1.6rem; }
             .trash-bin { width: 32px; height: 32px; font-size: 1rem; bottom: 35px; }
-            .item { width: 3rem; height: 3rem; font-size: 1.8rem; }
+            .item { width: 2.6rem; height: 2.6rem; font-size: 1.6rem; flex-shrink: 0; flex-grow: 0; }
             .stat-pill { font-size: 0.7rem; padding: 0.1rem 0.5rem; }
         }
         @media (max-width: 400px) {
             .level-grid { grid-template-columns: repeat(5, 1fr); }
+            .item { width: 2.2rem; height: 2.2rem; font-size: 1.2rem; }
         }
 
         .settings-icon {
@@ -945,6 +950,7 @@
             <div class="stats-row" style="display:flex;gap:0.8rem;justify-content:center;margin:0.5rem 0;">
                 <div class="stat-card">⭐ <span id="finalScore">0</span></div>
                 <div class="stat-card">⏱️ <span id="timeBonus">0</span></div>
+                <div class="stat-card">⏳ <span id="remainingTimeDisplay">0</span>s left</div>
             </div>
             <div class="star-display" id="starDisplay">☆☆☆</div>
             <div class="coins-earned-display">🪙 Coins Earned: <span id="coinsEarned">0</span></div>
@@ -1526,7 +1532,6 @@
                 fillItemQueue(config);
                 updateItemBelt();
 
-                // extra safety: if still empty, force again
                 if (state.itemQueue.length === 0) {
                     fillItemQueue(config);
                     updateItemBelt();
@@ -1636,7 +1641,6 @@
                 const junkChance = config.junkEnabled ? 0.1 : 0;
                 const goldenChance = CONFIG.GOLDEN_CHANCE;
 
-                // Always generate enough to fill the belt + some extra
                 const needed = Math.max(CONFIG.BELT_SIZE + 6, 14);
                 state.itemQueue = [];
                 for (let i = 0; i < needed; i++) {
@@ -1667,7 +1671,6 @@
                     return;
                 }
 
-                // Refill if queue is too short (always keep at least BELT_SIZE items)
                 if (state.itemQueue.length < CONFIG.BELT_SIZE) {
                     fillItemQueue(getLevelConfig(state.currentLevel));
                 }
@@ -1748,14 +1751,19 @@
                 const isOnTrash = x >= trashRect.left && x <= trashRect.right &&
                     y >= trashRect.top && y <= trashRect.bottom;
 
+                // === JUNK DROPPED ON TRASH ============================================
                 if (drag.isJunk && isOnTrash) {
                     state.junkCount++;
                     state.totalJunkDiscarded++;
                     document.getElementById('junkCount').textContent = state.junkCount;
-                    showFloatingText(x, y - 30, '🗑️ DISCARDED', '#A47864');
+                    showFloatingText(x, y - 30, '🗑️ DISCARDED +2s', '#A47864');
                     burstParticles(x, y, 8, 20);
                     playClickSound();
                     playCoinSound();
+
+                    // +2 seconds bonus (cap at initial time)
+                    state.timeLeft = Math.min(state.timeLeft + 2, state.levelStartTime);
+                    document.getElementById('gameTime').textContent = state.timeLeft;
 
                     if (drag.item && drag.item.parentNode) drag.item.remove();
                     const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk);
@@ -1766,9 +1774,9 @@
                     return;
                 }
 
+                // === JUNK DROPPED ON SHELF ============================================
                 if (drag.isJunk) {
-                    const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains(
-                    'shelf'));
+                    const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
                     if (targetEl) {
                         const tray = state.trays.find(t => t.el === targetEl);
                         if (tray && !tray.poisoned && tray.current < tray.max) {
@@ -1788,8 +1796,7 @@
                             if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
 
                             if (drag.item && drag.item.parentNode) drag.item.remove();
-                            const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag
-                            .isJunk);
+                            const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk);
                             if (idx !== -1) state.itemQueue.splice(idx, 1);
                             updateItemBelt();
                             updateProgressBar();
@@ -1801,11 +1808,13 @@
                     }
                 }
 
+                // === FOOD DROPPED ON SHELF ============================================
                 const targetEl = document.elementsFromPoint(x, y).find(el => el.classList && el.classList.contains('shelf'));
                 if (targetEl && !drag.isJunk) {
                     const tray = state.trays.find(t => t.el === targetEl);
-                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state
-                        .gameWon && !state.isPaused) {
+                    // Check if the drop is valid (correct emoji, not full, not poisoned)
+                    if (tray && drag.emoji === tray.emoji && tray.current < tray.max && !tray.poisoned && !state.gameWon && !state.isPaused) {
+                        // SUCCESS
                         tray.current++;
                         tray.badge.textContent = `${tray.current}/${tray.max}`;
                         tray.spoilageTimer = tray.maxSpoilage;
@@ -1850,21 +1859,45 @@
 
                         if (state.trays.every(t => t.current >= t.max || t.poisoned)) endGame('win');
                     } else {
+                        // FAILURE: Wrong item or shelf full / poisoned
                         state.combo = 0;
                         state.mistakes++;
                         document.getElementById('comboDisplay').textContent = 'x1';
                         state.currentScore = Math.max(0, state.currentScore - CONFIG.PENALTY_PER_MISTAKE);
                         document.getElementById('gameScore').textContent = state.currentScore;
                         shakeFridge();
-                        if (tray && tray.poisoned) {
+
+                        // If the shelf exists and is not poisoned and not full, remove 2 items from it
+                        if (tray && !tray.poisoned && tray.current > 0) {
+                            const removeCount = Math.min(2, tray.current);
+                            tray.current -= removeCount;
+                            tray.badge.textContent = `${tray.current}/${tray.max}`;
+                            if (tray.current < tray.max) {
+                                tray.el.classList.remove('hidden-tray');
+                                tray.el.classList.remove('full');
+                            }
+                            showFloatingText(x, y - 30, `-${removeCount} ITEMS!`, '#BF5722');
+                            burstParticles(x, y, 12, 0);
+                        } else if (tray && tray.poisoned) {
                             showFloatingText(x, y - 30, '☠️ SHELF POISONED!', '#BF5722');
+                        } else if (tray && tray.current >= tray.max) {
+                            showFloatingText(x, y - 30, 'FULL!', '#BF5722');
                         } else {
                             showFloatingText(x, y - 30, 'WRONG!', '#BF5722');
                         }
                         playWrongSound();
                         if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+                        // Remove the dragged item from queue
+                        if (drag.item && drag.item.parentNode) drag.item.remove();
+                        const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
+                            i.isGolden === drag.isGolden);
+                        if (idx !== -1) state.itemQueue.splice(idx, 1);
+                        updateItemBelt();
+                        updateProgressBar();
                     }
                 } else if (!drag.isJunk) {
+                    // Dropped outside any shelf – treat as miss
                     state.combo = 0;
                     state.mistakes++;
                     document.getElementById('comboDisplay').textContent = 'x1';
@@ -1874,6 +1907,13 @@
                     showFloatingText(x, y - 30, 'MISS!', '#BF5722');
                     playWrongSound();
                     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+                    // Remove item from queue
+                    if (drag.item && drag.item.parentNode) drag.item.remove();
+                    const idx = state.itemQueue.findIndex(i => i.emoji === drag.emoji && i.isJunk === drag.isJunk &&
+                        i.isGolden === drag.isGolden);
+                    if (idx !== -1) state.itemQueue.splice(idx, 1);
+                    updateItemBelt();
                 }
 
                 cleanupDrag();
@@ -1962,7 +2002,6 @@
                                     tray.spoilageTimer = tray.maxSpoilage;
                                 }
 
-                                // refresh belt because a tray became available again
                                 updateItemBelt();
                             } else {
                                 tray.spoilageTimer = tray.maxSpoilage * 0.5;
@@ -2033,6 +2072,9 @@
                 let coinsEarned = 0;
                 const isGatekeeper = isGatekeeperLevel(state.currentLevel);
 
+                // Show remaining time in modal
+                document.getElementById('remainingTimeDisplay').textContent = Math.max(0, state.timeLeft);
+
                 if (result === 'win') {
                     const level = state.currentLevel;
                     const baseCoins = calculateCoinsEarned(level);
@@ -2067,7 +2109,7 @@
 
                     let titleText = '🧊 FRIDGE MASTER!';
                     let msgText =
-                        `Level ${level} completed! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+                        `Level ${level} completed! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
 
                     if (state.mistakes === 0) msgText += '\n⭐ PERFECT! No mistakes!';
 
@@ -2075,11 +2117,11 @@
                         const cost = getGatekeeperCost(level);
                         titleText = '⭐ GATEKEEPER LEVEL!';
                         msgText =
-                            `Level ${level} completed, but you need 3 stars to unlock the next block!\nYou got ${stars} star${stars > 1 ? 's' : ''}. Retry for 3 stars or unlock with ${cost} coins!`;
+                            `Level ${level} completed, but you need 3 stars to unlock the next block!\nYou got ${stars} star${stars > 1 ? 's' : ''}. Retry for 3 stars or unlock with ${cost} coins!\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
                     } else if (isGatekeeper && stars === 3) {
                         titleText = '⭐ GATEKEEPER MASTERED!';
                         msgText =
-                            `Level ${level} completed with 3 stars! The next block is now unlocked! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins`;
+                            `Level ${level} completed with 3 stars! The next block is now unlocked! 🎉\nBase: ${baseCoins} coins + Star bonus: ${starBonus} coins\n⏳ Time left: ${Math.max(0, state.timeLeft)}s`;
                         celebrateConfetti(window.innerWidth / 2, window.innerHeight / 2, 60);
                     }
 
@@ -2114,7 +2156,7 @@
                 } else {
                     state.losses[state.currentCategory]++;
                     document.getElementById('resultTitle').textContent = '😅 OUT OF TIME, CHEF!';
-                    document.getElementById('resultMessage').textContent = 'Don\'t let the groceries spoil! Retry!';
+                    document.getElementById('resultMessage').textContent = `Don't let the groceries spoil! Retry!\n⏳ Time left: 0s`;
                     document.getElementById('coinsEarned').textContent = '0';
                     document.getElementById('gatekeeperMessage').style.display = 'none';
                     playWrongSound();
